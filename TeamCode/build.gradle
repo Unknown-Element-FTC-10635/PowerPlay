@@ -29,4 +29,7 @@ dependencies {
 
     // OpenCV
     implementation 'org.openftc:easyopencv:1.5.2'
+
+    // FTCLib
+    implementation 'org.ftclib.ftclib:core:2.0.1'
 }
