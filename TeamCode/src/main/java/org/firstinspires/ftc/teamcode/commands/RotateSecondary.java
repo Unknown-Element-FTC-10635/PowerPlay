@@ -7,9 +7,9 @@ import org.firstinspires.ftc.teamcode.subsystems.SecondaryRotation;
 public class RotateSecondary extends CommandBase {
     private final SecondaryRotation secondaryRotation;
 
-    private final double targetAngle;
+    private final int targetAngle;
 
-    public RotateSecondary(SecondaryRotation secondaryRotation, double targetAngle) {
+    public RotateSecondary(SecondaryRotation secondaryRotation, int targetAngle) {
         addRequirements(secondaryRotation);
 
         this.secondaryRotation = secondaryRotation;
@@ -18,7 +18,7 @@ public class RotateSecondary extends CommandBase {
 
     @Override
     public void initialize() {
-        secondaryRotation.rotateTo(targetAngle);
+        secondaryRotation.rotateTo(targetAngle, 0.1);
     }
 
     @Override

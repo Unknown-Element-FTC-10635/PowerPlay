@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.arcrobotics.ftclib.hardware.ServoEx;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -9,27 +9,31 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class SecondaryRotation extends SubsystemBase {
     private final Telemetry telemetry;
 
-    private final ServoEx leftRotation, rightRotation;
+    private final Motor rotation;
 
     private double angle;
 
     public SecondaryRotation(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
-        leftRotation = hardwareMap.get(ServoEx.class, "leftSRotation");
-        rightRotation = hardwareMap.get(ServoEx.class, "rightSRotation");
-        rightRotation.setInverted(true);
+        rotation = new Motor(hardwareMap, "SRotation");
+        rotation.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
     }
 
     public void rotatePower(float power) {
-        leftRotation.setPosition(leftRotation.getPosition() + power * 0.01);
-        rightRotation.setPosition(rightRotation.getPosition() + power * 0.01);
+        rotation.setRunMode(Motor.RunMode.RawPower);
+
+        rotation.set(power);
     }
 
-    public void rotateTo(double angle) {
-        leftRotation.setPosition(angle);
-        rightRotation.setPosition(angle);
+    public void rotateTo(int targetAngle, double power) {
+        rotation.setRunMode(Motor.RunMode.PositionControl);
+
+        rotation.setTargetPosition(targetAngle);
+
+        rotation.set(power);
     }
+
 
     public double getAngle() {
         return angle;
@@ -37,7 +41,7 @@ public class SecondaryRotation extends SubsystemBase {
 
     @Override
     public void periodic() {
-        angle = (leftRotation.getAngle() + rightRotation.getAngle()) / 2;
+        angle = rotation.getDistance();
 
         telemetry.addData("Secondary Rotation Angle:", angle);
     }

@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Extension;
+import org.firstinspires.ftc.teamcode.subsystems.LimitSwitch;
 import org.firstinspires.ftc.teamcode.subsystems.PrimaryRotation;
 import org.firstinspires.ftc.teamcode.subsystems.SecondaryRotation;
 import org.firstinspires.ftc.teamcode.subsystems.TertiaryRotation;
@@ -36,6 +37,7 @@ public class BlueRightMedium extends CommandOpMode {
         SecondaryRotation secondaryRotation = new SecondaryRotation(hardwareMap, telemetry);
         TertiaryRotation tertiaryRotation = new TertiaryRotation(hardwareMap, telemetry, primaryRotation);
         Extension extension = new Extension(hardwareMap, telemetry);
+        LimitSwitch limitSwitch = new LimitSwitch(hardwareMap, telemetry, "primarySwitch");
         Claw claw = new Claw(hardwareMap, telemetry);
 
         BaseWebcam baseWebcam = new BaseWebcam(hardwareMap);
@@ -78,7 +80,7 @@ public class BlueRightMedium extends CommandOpMode {
                         new InstantCommand(primaryRotation::reset),
                         new ParallelCommandGroup(
                                 new FollowTrajectoryCommand(drive, preloadDelivery),
-                                new UnfoldArm(primaryRotation, secondaryRotation, tertiaryRotation)
+                                new UnfoldArm(primaryRotation, tertiaryRotation, extension, limitSwitch)
                         ),
                         new ExtendSlides(extension, 7, 0.5),
                         new InstantCommand(claw::open)

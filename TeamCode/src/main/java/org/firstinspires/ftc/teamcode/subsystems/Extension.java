@@ -16,8 +16,8 @@ public class Extension extends SubsystemBase {
     public Extension(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
-        leftExtension = hardwareMap.get(Motor.class, "leftExtension");
-        rightExtension = hardwareMap.get(Motor.class, "rightExtension");
+        leftExtension = new Motor(hardwareMap, "leftExtension"); //hardwareMap.get(Motor.class, "leftExtension");
+        rightExtension = new Motor(hardwareMap, "rightExtension"); //hardwareMap.get(Motor.class, "rightExtension");
         rightExtension.setInverted(true);
     }
 
@@ -33,7 +33,7 @@ public class Extension extends SubsystemBase {
         leftExtension.setRunMode(Motor.RunMode.PositionControl);
         rightExtension.setRunMode(Motor.RunMode.PositionControl);
 
-        targetInches = inches * 7.0314986;
+        targetInches = inches / 7.0314986;
         leftExtension.setTargetDistance(targetInches);
         rightExtension.setTargetDistance(targetInches);
 
@@ -48,6 +48,10 @@ public class Extension extends SubsystemBase {
 
     public boolean atTargetExtension() {
         return (distance > targetInches);
+    }
+
+    public boolean atTargetRetraction() {
+        return (distance < targetInches);
     }
 
     public double getDistance() {
