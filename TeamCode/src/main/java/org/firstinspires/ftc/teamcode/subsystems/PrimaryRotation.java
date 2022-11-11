@@ -15,14 +15,16 @@ public class PrimaryRotation extends SubsystemBase {
 
     private SubsystemState state = SubsystemState.UNKNOWN;
 
-    private double angle, lockAngle;
+    private double angle, targetAngle, lockAngle, setPower;
+
+    private boolean slowLift = false;
 
     public PrimaryRotation(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
         leftRotation = new Motor(hardwareMap, "leftPRotation");//hardwareMap.get(Motor.class, "leftPRotation");
         //rightRotation = new Motor(hardwareMap, "rightPRotation"); //hardwareMap.get(Motor.class, "rightPRotation");
-        leftBarEncoder = new Motor(hardwareMap, "fl").encoder;//hardwareMap.get(Motor.Encoder.class, "br");
+        leftBarEncoder = new Motor(hardwareMap, "fr").encoder;//hardwareMap.get(Motor.Encoder.class, "br");
         leftBarEncoder.reset();
 
         leftRotation.encoder = leftBarEncoder;
@@ -54,13 +56,26 @@ public class PrimaryRotation extends SubsystemBase {
         leftRotation.setTargetPosition(targetAngle);
         //rightRotation.setTargetPosition(targetAngle);
 
-        leftRotation.set(power);
+        setPower = power;
+        leftRotation.set(setPower);
         //rightRotation.set(power);
+
+        this.targetAngle = targetAngle;
     }
 
     @Override
     public void periodic() {
         angle = leftBarEncoder.getPosition()* 0.17578*0.25+45.6;
+
+        if (slowLift) {
+            if (angle < 170) {
+                // https://www.desmos.com/calculator/w8omojaitz
+                double multiplier = 1/(1+Math.pow(Math.E, -((1.0/3.0) * (170 - angle) - 3)));
+                leftRotation.set(setPower * multiplier);
+            } else if (setPower < 0){
+                leftRotation.set(setPower);
+            }
+        }
 
         if (state == SubsystemState.STOPPING) {
             lockAngle = angle;
@@ -73,7 +88,7 @@ public class PrimaryRotation extends SubsystemBase {
     }
 
     public boolean atTargetPosition() {
-        return (leftRotation.atTargetPosition()); // && rightRotation.atTargetPosition());
+        return (angle > targetAngle); // && rightRotation.atTargetPosition());
     }
 
     public void stop() {
@@ -83,6 +98,8 @@ public class PrimaryRotation extends SubsystemBase {
 
     public void reset() {
         leftRotation.resetEncoder();
+        leftBarEncoder.reset();
+        //angle = 45.6;
         //rightRotation.resetEncoder();
     }
 
@@ -96,5 +113,9 @@ public class PrimaryRotation extends SubsystemBase {
 
     public void setState(SubsystemState state) {
         this.state = state;
+    }
+
+    public void setSlowLift(boolean slowLift) {
+        this.slowLift = slowLift;
     }
 }

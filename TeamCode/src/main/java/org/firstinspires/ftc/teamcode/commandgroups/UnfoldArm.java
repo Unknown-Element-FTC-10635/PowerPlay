@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.commands.ExtendSlides;
 import org.firstinspires.ftc.teamcode.commands.FlipPrimary;
 import org.firstinspires.ftc.teamcode.commands.RotatePrimary;
 import org.firstinspires.ftc.teamcode.commands.RotateSecondary;
+import org.firstinspires.ftc.teamcode.commands.RotateTertiary;
 import org.firstinspires.ftc.teamcode.subsystems.Extension;
 import org.firstinspires.ftc.teamcode.subsystems.LimitSwitch;
 import org.firstinspires.ftc.teamcode.subsystems.PrimaryRotation;
@@ -22,10 +23,7 @@ public class UnfoldArm extends SequentialCommandGroup {
         addCommands(
                 new ParallelCommandGroup(
                         new FlipPrimary(primaryRotation, extension, limitSwitch),
-                        new SequentialCommandGroup(
-                                new WaitCommand(100),
-                                new InstantCommand(tertiaryRotation::goToInitialPosition)
-                        )
+                        new RotateTertiary(tertiaryRotation, 0.45)
                 ),
                 new InstantCommand(() -> tertiaryRotation.setBeginAdjustment(true))
         );

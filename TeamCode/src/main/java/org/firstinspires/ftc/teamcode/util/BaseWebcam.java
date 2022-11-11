@@ -48,7 +48,7 @@ public class BaseWebcam {
             @Override
             public void onOpened() {
                 logger.info("Calling StartStreaming");
-                webcam.startStreaming(640, 480, OpenCvCameraRotation.SIDEWAYS_RIGHT);
+                webcam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override

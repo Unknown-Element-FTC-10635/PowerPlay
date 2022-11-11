@@ -29,8 +29,8 @@ public class TertiaryRotation extends SubsystemBase {
     }
 
     public void goToInitialPosition() {
-        leftRotation.setPosition(0.25);
-        rightRotation.setPosition(0.25);
+        leftRotation.setPosition(0.60);
+        rightRotation.setPosition(0.60);
     }
 
     public void increasePositiveDirection() {
@@ -41,6 +41,11 @@ public class TertiaryRotation extends SubsystemBase {
     public void increaseNegativeDirection() {
         leftRotation.setPosition(leftRotation.getPosition() - 0.01);
         rightRotation.setPosition(rightRotation.getPosition() - 0.01);
+    }
+
+    public void goToPosition(double position) {
+        leftRotation.setPosition(position);
+        rightRotation.setPosition(position);
     }
 
     public boolean isBeginningAdjustment() {

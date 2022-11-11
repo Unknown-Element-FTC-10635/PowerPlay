@@ -23,8 +23,6 @@ public class WebcamTesting extends OpMode {
 
     @Override
     public void stop() {
-        webcam.stop();
-
         super.stop();
     }
 }
