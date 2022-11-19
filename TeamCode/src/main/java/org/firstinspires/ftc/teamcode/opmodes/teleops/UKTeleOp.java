@@ -114,7 +114,7 @@ public class UKTeleOp extends OpMode {
                     primaryPreviouslyMoving = true;
                 }
 
-                primaryRotation.rotatePower(gamepad2.left_stick_y * (float)0.75);
+                primaryRotation.rotatePower(gamepad2.left_stick_y);
 
             } else {
                 primaryRotation.stop();
@@ -186,9 +186,12 @@ public class UKTeleOp extends OpMode {
             }
         }
 
+        if (limitSwitch.isPressed()) {
+            primaryRotation.reset();
+        }
+
         telemetry.addData("Adjusting", adjustmentToggle);
         telemetry.addData("Loop Time", loopTime.milliseconds());
-        telemetry.update();
     }
 
     @Override
