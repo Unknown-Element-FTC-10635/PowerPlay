@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleops;
 
 import com.arcrobotics.ftclib.command.CommandScheduler;
-import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.arcrobotics.ftclib.gamepad.ToggleButtonReader;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.exception.RobotCoreException;
@@ -17,7 +14,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Extension;
 import org.firstinspires.ftc.teamcode.subsystems.LimitSwitch;
 import org.firstinspires.ftc.teamcode.subsystems.PrimaryRotation;
-import org.firstinspires.ftc.teamcode.subsystems.SecondaryRotation;
 import org.firstinspires.ftc.teamcode.subsystems.TertiaryRotation;
 import org.firstinspires.ftc.teamcode.util.SubsystemState;
 
@@ -26,7 +22,6 @@ public class UKTeleOp extends OpMode {
     private DcMotor frontLeft, frontRight, backLeft, backRight;
 
     private PrimaryRotation primaryRotation;
-    private SecondaryRotation secondaryRotation;
     private TertiaryRotation tertiaryRotation;
     private LimitSwitch limitSwitch;
     private Extension extension;
@@ -59,7 +54,6 @@ public class UKTeleOp extends OpMode {
 
         // Subsystems
         primaryRotation = new PrimaryRotation(hardwareMap, telemetry);
-        secondaryRotation = new SecondaryRotation(hardwareMap, telemetry);
         tertiaryRotation = new TertiaryRotation(hardwareMap, telemetry, primaryRotation);
         limitSwitch = new LimitSwitch(hardwareMap, telemetry, "primarySwitch");
         extension = new Extension(hardwareMap, telemetry);
@@ -74,7 +68,7 @@ public class UKTeleOp extends OpMode {
 
     @Override
     public void start() {
-        CommandScheduler.getInstance().registerSubsystem(primaryRotation, secondaryRotation,
+        CommandScheduler.getInstance().registerSubsystem(primaryRotation,
                                                         tertiaryRotation, limitSwitch, extension, claw);
         //tertiaryRotation.setBeginAdjustment(true);
     }
@@ -125,11 +119,6 @@ public class UKTeleOp extends OpMode {
                     primaryRotation.setState(SubsystemState.STOPPED);
                 }
             }
-        }
-
-        // Secondary
-        if (CommandScheduler.getInstance().requiring(secondaryRotation) == null) {
-            secondaryRotation.rotatePower((gamepad2.right_trigger - gamepad2.left_trigger));
         }
 
         if (currentGamepad1.cross && !previousGamepad1.cross) {
