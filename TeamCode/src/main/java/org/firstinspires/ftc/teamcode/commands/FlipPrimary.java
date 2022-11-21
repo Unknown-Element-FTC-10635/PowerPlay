@@ -22,7 +22,6 @@ public class FlipPrimary extends CommandBase {
 
     @Override
     public void initialize() {
-        extension.rotatePower((float)-0.05);
         primaryRotation.rotatePower((float)-0.5);
     }
 
@@ -40,6 +39,5 @@ public class FlipPrimary extends CommandBase {
     public void end(boolean interrupted) {
         primaryRotation.stop();
         primaryRotation.reset();
-        extension.stop();
     }
 }

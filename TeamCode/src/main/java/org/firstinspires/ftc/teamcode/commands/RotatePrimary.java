@@ -24,7 +24,6 @@ public class RotatePrimary extends CommandBase {
     @Override
     public void initialize() {
         primaryRotation.rotateTo(targetAngle, speed);
-        extension.rotatePower((float)-0.05);
     }
 
     @Override
@@ -35,6 +34,5 @@ public class RotatePrimary extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         primaryRotation.stop();
-        extension.stop();
     }
 }

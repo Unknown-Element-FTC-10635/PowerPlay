@@ -38,6 +38,7 @@ public class UKTeleOp extends OpMode {
     private boolean clawToggle = false;
     private boolean adjustmentToggle = false;
     private boolean speedToggle = false;
+    private boolean positionToggle = false;
 
     private double wheelMultiplier = 0.75;
 
@@ -140,7 +141,21 @@ public class UKTeleOp extends OpMode {
 
         // Primary
         if (CommandScheduler.getInstance().requiring(extension) == null) {
-            extension.rotatePower((gamepad2.right_trigger - gamepad2.left_trigger) / 2);
+            if (currentGamepad2.cross && !previousGamepad2.cross) {
+                extension.goTo(Extension.ExtensionPosition.SUBSTATION);
+            }
+
+            if (currentGamepad2.triangle && !previousGamepad2.triangle) {
+                extension.goTo(Extension.ExtensionPosition.HIGH);
+            }
+
+            if (currentGamepad2.square && !previousGamepad2.square) {
+                extension.goTo(Extension.ExtensionPosition.LOW);
+            }
+
+            if (currentGamepad2.circle && !previousGamepad2.circle) {
+                extension.goTo(Extension.ExtensionPosition.MEDIUM);
+            }
         }
 
 

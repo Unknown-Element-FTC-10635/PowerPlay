@@ -3,65 +3,46 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Extension extends SubsystemBase {
+    public enum ExtensionPosition {
+        RETRACTED(0.1),
+        SUBSTATION(0.8),
+        TERMINAL(0.3),
+        LOW(0.4),
+        MEDIUM(0.6),
+        HIGH(0.7);
+
+        public double position;
+
+        ExtensionPosition(double position) {
+            this.position = position;
+        }
+    }
+
     private final Telemetry telemetry;
 
-    private final Motor leftExtension, rightExtension;
-
-    private double distance, targetInches;
+    private final Servo leftExtension, rightExtension;
 
     public Extension(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
-        leftExtension = new Motor(hardwareMap, "leftExtension"); //hardwareMap.get(Motor.class, "leftExtension");
-        rightExtension = new Motor(hardwareMap, "rightExtension"); //hardwareMap.get(Motor.class, "rightExtension");
-        rightExtension.setInverted(true);
+        leftExtension = hardwareMap.get(Servo.class, "leftExtension"); //hardwareMap.get(Motor.class, "leftExtension");
+        rightExtension = hardwareMap.get(Servo.class, "rightExtension"); //hardwareMap.get(Motor.class, "rightExtension");
+        rightExtension.setDirection(Servo.Direction.REVERSE);
     }
 
-    public void rotatePower(float power) {
-        leftExtension.setRunMode(Motor.RunMode.RawPower);
-        rightExtension.setRunMode(Motor.RunMode.RawPower);
-
-        leftExtension.set(power);
-        rightExtension.set(power);
-    }
-
-    public void rotateInches(double inches, double power) {
-        leftExtension.setRunMode(Motor.RunMode.PositionControl);
-        rightExtension.setRunMode(Motor.RunMode.PositionControl);
-
-        targetInches = inches / 7.0314986;
-        leftExtension.setTargetDistance(targetInches);
-        rightExtension.setTargetDistance(targetInches);
-
-        leftExtension.set(power);
-        rightExtension.set(power);
-    }
-
-    public void stop() {
-        leftExtension.stopMotor();
-        rightExtension.stopMotor();
-    }
-
-    public boolean atTargetExtension() {
-        return (distance > targetInches);
-    }
-
-    public boolean atTargetRetraction() {
-        return (distance < targetInches);
-    }
-
-    public double getDistance() {
-        return distance;
+    public void goTo(ExtensionPosition position) {
+        leftExtension.setPosition(position.position);
+        rightExtension.setPosition(position.position);
     }
 
     @Override
     public void periodic() {
-        distance = (leftExtension.getDistance() + leftExtension.getDistance()) / 2;
-
-        telemetry.addData("Secondary Rotation Distance:", distance / 7.0314986);
+        telemetry.addData("Extension (Left) Position:", leftExtension.getPosition());
+        telemetry.addData("Extension (Right) Position:", rightExtension.getPosition());
     }
 }
