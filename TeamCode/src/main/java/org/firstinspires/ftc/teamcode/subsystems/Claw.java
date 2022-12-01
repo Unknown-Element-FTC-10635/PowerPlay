@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.arcrobotics.ftclib.hardware.SimpleServo;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -18,6 +20,7 @@ public class Claw extends SubsystemBase {
     private final Telemetry telemetry;
 
     private final Servo leftRotation;
+    private final CRServo leftWheel, rightWheel;
     private final ServoEx rightRotation;
 
     private State currentState;
@@ -27,21 +30,30 @@ public class Claw extends SubsystemBase {
 
         leftRotation = hardwareMap.get(Servo.class, "leftClaw"); //new SimpleServo(hardwareMap, "leftClaw", 0, 180, AngleUnit.DEGREES);
         rightRotation = new SimpleServo(hardwareMap, "rightClaw", 0, 180, AngleUnit.DEGREES); //hardwareMap.get(ServoEx.class, "rightClaw");
-        //rightRotation.setInverted(true);
+
+        leftWheel = hardwareMap.get(CRServo.class, "leftWheel");
+        rightWheel = hardwareMap.get(CRServo.class, "rightWheel");
+        leftWheel.setDirection(DcMotorSimple.Direction.REVERSE);
 
         currentState = State.CLOSED;
     }
 
     public void open() {
-        leftRotation.setPosition(0.95);
-        rightRotation.setPosition(0.35);
+        leftRotation.setPosition(0.79);
+        rightRotation.setPosition(0.51);
+
+        leftWheel.setPower(0.3);
+        rightWheel.setPower(0.3);
 
         currentState = State.OPEN;
     }
 
     public void close() {
-        leftRotation.setPosition(0.75);
-        rightRotation.setPosition(0.55);
+        leftRotation.setPosition(0.84);
+        rightRotation.setPosition(0.46);
+
+        leftWheel.setPower(0.0);
+        rightWheel.setPower(0.0);
 
         currentState = State.CLOSED;
     }

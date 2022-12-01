@@ -93,10 +93,6 @@ public class UKTeleOp extends OpMode {
         backLeft.setPower(((gamepad1.left_stick_y + gamepad1.left_stick_x) - gamepad1.right_stick_x) * wheelMultiplier);
         frontRight.setPower(((gamepad1.left_stick_y + gamepad1.left_stick_x) + gamepad1.right_stick_x) * wheelMultiplier);
 
-        if (currentGamepad2.triangle && !previousGamepad2.triangle) {
-            CommandScheduler.getInstance().schedule(new UnfoldArm(primaryRotation, tertiaryRotation, extension, limitSwitch));
-        }
-
         CommandScheduler.getInstance().run();
 
         // Secondary
@@ -141,21 +137,7 @@ public class UKTeleOp extends OpMode {
 
         // Primary
         if (CommandScheduler.getInstance().requiring(extension) == null) {
-            if (currentGamepad2.cross && !previousGamepad2.cross) {
-                extension.goTo(Extension.ExtensionPosition.SUBSTATION);
-            }
-
-            if (currentGamepad2.triangle && !previousGamepad2.triangle) {
-                extension.goTo(Extension.ExtensionPosition.HIGH);
-            }
-
-            if (currentGamepad2.square && !previousGamepad2.square) {
-                extension.goTo(Extension.ExtensionPosition.LOW);
-            }
-
-            if (currentGamepad2.circle && !previousGamepad2.circle) {
-                extension.goTo(Extension.ExtensionPosition.MEDIUM);
-            }
+            extension.rotatePower((gamepad2.right_trigger - gamepad2.left_trigger) / 2);
         }
 
 
