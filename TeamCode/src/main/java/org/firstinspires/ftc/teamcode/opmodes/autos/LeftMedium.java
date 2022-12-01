@@ -24,8 +24,8 @@ import org.firstinspires.ftc.teamcode.util.BaseWebcam;
 import org.firstinspires.ftc.teamcode.util.RobotLocation;
 import org.firstinspires.ftc.teamcode.visionpipeline.SleeveDetection;
 
-@Autonomous(name = "RIGHT - Medium")
-public class BlueRightMedium extends CommandOpMode {
+@Autonomous(name = "LEFT - Medium")
+public class LeftMedium extends CommandOpMode {
     @Override
     public void initialize() {
         telemetry.addLine("Creating Subsystems");
@@ -45,34 +45,34 @@ public class BlueRightMedium extends CommandOpMode {
         telemetry.addLine("Creating Paths");
         telemetry.update();
 
-        Pose2d start = new Pose2d(-36.0, 64, Math.toRadians(270));
+        Pose2d start = new Pose2d(36.0, 64, Math.toRadians(270));
         drive.setPoseEstimate(start);
 
         TrajectorySequence preloadDelivery = drive.trajectorySequenceBuilder(start)
-                .splineTo(new Vector2d(-30, 37), Math.toRadians(-54))
+                .splineTo(new Vector2d(30, 35), Math.toRadians(-125))
                 .build();
 
         TrajectorySequence safePosition = drive.trajectorySequenceBuilder(preloadDelivery.end())
                 .setReversed(true)
-                .splineTo(new Vector2d(-37, 50), Math.toRadians(90))
+                .splineTo(new Vector2d(37, 50), Math.toRadians(90))
                 .build();
 
-        TrajectorySequence purple = drive.trajectorySequenceBuilder(safePosition.end())
-                .lineTo(new Vector2d(-37, 15))
-                .turn(Math.toRadians(90))
-                .lineTo(new Vector2d(-11, 15))
-                .turn(Math.toRadians(95))
+        TrajectorySequence green = drive.trajectorySequenceBuilder(safePosition.end())
+                .lineTo(new Vector2d(38, 15))
+                .turn(Math.toRadians(-90))
+                .lineTo(new Vector2d(11, 15))
+                .turn(Math.toRadians(-95))
                 .forward(5)
                 .build();
 
         TrajectorySequence orange = drive.trajectorySequenceBuilder(safePosition.end())
-                .lineTo(new Vector2d(-35, 15))
+                .lineTo(new Vector2d(35, 15))
                 .build();
 
-        TrajectorySequence green = drive.trajectorySequenceBuilder(safePosition.end())
-                .lineTo(new Vector2d(-37, 15))
-                .turn(Math.toRadians(90))
-                .lineTo(new Vector2d(-61, 15))
+        TrajectorySequence purple = drive.trajectorySequenceBuilder(safePosition.end())
+                .lineTo(new Vector2d(37, 15))
+                .turn(Math.toRadians(-90))
+                .lineTo(new Vector2d(61, 15))
                 .build();
 
         telemetry.addLine("Starting Webcam");
@@ -104,7 +104,6 @@ public class BlueRightMedium extends CommandOpMode {
                                 new InstantCommand(tertiaryRotation::goToInitialPosition),
                                 new RotatePrimary(primaryRotation, extension, 150, -0.6)
                         ),
-                        new WaitCommand(500),
                         new RotateTertiary(tertiaryRotation, 0.75),
                         new InstantCommand(claw::open),
                         new ParallelCommandGroup(
