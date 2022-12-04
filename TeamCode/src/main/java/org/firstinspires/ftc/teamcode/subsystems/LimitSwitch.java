@@ -23,7 +23,5 @@ public class LimitSwitch extends SubsystemBase {
     @Override
     public void periodic() {
         telemetry.addData("Limit Switch Status:", limitSwitch.getState());
-        telemetry.update();
-
     }
 }
