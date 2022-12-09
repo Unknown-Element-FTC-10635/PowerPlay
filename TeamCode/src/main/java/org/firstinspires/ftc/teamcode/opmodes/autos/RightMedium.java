@@ -57,22 +57,18 @@ public class RightMedium extends CommandOpMode {
                 .splineTo(new Vector2d(-37, 50), Math.toRadians(90))
                 .build();
 
-        TrajectorySequence purple = drive.trajectorySequenceBuilder(safePosition.end())
-                .lineTo(new Vector2d(-37, 15))
-                .turn(Math.toRadians(90))
-                .lineTo(new Vector2d(-11, 15))
-                .turn(Math.toRadians(95))
-                .forward(5)
+        TrajectorySequence orange = drive.trajectorySequenceBuilder(start)
+                .lineTo(new Vector2d(-36, 38))
                 .build();
 
-        TrajectorySequence orange = drive.trajectorySequenceBuilder(safePosition.end())
-                .lineTo(new Vector2d(-35, 15))
+        TrajectorySequence purple = drive.trajectorySequenceBuilder(orange.end())
+                .lineTo(new Vector2d(-11, 38))
+                .forward(3)
                 .build();
 
-        TrajectorySequence green = drive.trajectorySequenceBuilder(safePosition.end())
-                .lineTo(new Vector2d(-37, 15))
-                .turn(Math.toRadians(90))
-                .lineTo(new Vector2d(-61, 15))
+        TrajectorySequence green = drive.trajectorySequenceBuilder(orange.end())
+                .lineTo(new Vector2d(-63, 38))
+                .forward(3)
                 .build();
 
         telemetry.addLine("Starting Webcam");
@@ -91,19 +87,25 @@ public class RightMedium extends CommandOpMode {
         telemetry.addLine("Scheduling Tasks");
         telemetry.update();
 
+        primaryRotation.reset();
+
         register(primaryRotation, tertiaryRotation, limitSwitch, extension, claw);
 
         schedule(
-                new SequentialCommandGroup(
-                        new InstantCommand(baseWebcam::stop),
-                        new InstantCommand(claw::open),
-                        new InstantCommand(claw::close),
-                        //new InstantCommand(tertiaryRotation::goToInitialPosition)
-                        new ParallelCommandGroup(
-                                new FollowTrajectoryCommand(drive, preloadDelivery),
-                                new InstantCommand(tertiaryRotation::goToInitialPosition),
-                                new RotatePrimary(primaryRotation, extension, 150, -0.6)
-                        ),
+                new ParallelCommandGroup(
+                        new SequentialCommandGroup(
+                                new InstantCommand(baseWebcam::stop),
+                                new InstantCommand(claw::close),
+                                //new InstantCommand(tertiaryRotation::goToInitialPosition)
+                                //new ParallelCommandGroup(
+                                //new FollowTrajectoryCommand(drive, preloadDelivery)
+                                //new InstantCommand(tertiaryRotation::goToInitialPosition),
+                                //new RotatePrimary(primaryRotation, extension, -100, 0.6)
+                                //)
+                                new FollowTrajectoryCommand(drive, orange),
+                                new PickPark(drive, sleeveColor, purple, green)
+                        )
+                        /*
                         new WaitCommand(500),
                         new RotateTertiary(tertiaryRotation, 0.75),
                         new InstantCommand(claw::open),
@@ -121,6 +123,7 @@ public class RightMedium extends CommandOpMode {
                         new WaitCommand(500),
                         new InstantCommand(() -> primaryRotation.setSlowLift(true)),
                         new RotatePrimary(primaryRotation, extension,100, -0.4)
+                )
                          */
                 )
         );

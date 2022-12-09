@@ -57,22 +57,18 @@ public class LeftMedium extends CommandOpMode {
                 .splineTo(new Vector2d(37, 50), Math.toRadians(90))
                 .build();
 
-        TrajectorySequence green = drive.trajectorySequenceBuilder(safePosition.end())
-                .lineTo(new Vector2d(38, 15))
-                .turn(Math.toRadians(-90))
-                .lineTo(new Vector2d(11, 15))
-                .turn(Math.toRadians(-95))
-                .forward(5)
+        TrajectorySequence orange = drive.trajectorySequenceBuilder(start)
+                .lineTo(new Vector2d(36, 38))
                 .build();
 
-        TrajectorySequence orange = drive.trajectorySequenceBuilder(safePosition.end())
-                .lineTo(new Vector2d(35, 15))
+        TrajectorySequence green = drive.trajectorySequenceBuilder(orange.end())
+                .lineTo(new Vector2d(11, 38))
+                .forward(3)
                 .build();
 
-        TrajectorySequence purple = drive.trajectorySequenceBuilder(safePosition.end())
-                .lineTo(new Vector2d(37, 15))
-                .turn(Math.toRadians(-90))
-                .lineTo(new Vector2d(61, 15))
+        TrajectorySequence purple = drive.trajectorySequenceBuilder(orange.end())
+                .lineTo(new Vector2d(63, 38))
+                .forward(3)
                 .build();
 
         telemetry.addLine("Starting Webcam");
@@ -96,25 +92,10 @@ public class LeftMedium extends CommandOpMode {
         schedule(
                 new SequentialCommandGroup(
                         new InstantCommand(baseWebcam::stop),
-                        new InstantCommand(claw::open),
                         new InstantCommand(claw::close),
-                        //new InstantCommand(tertiaryRotation::goToInitialPosition)
-                        new ParallelCommandGroup(
-                                new FollowTrajectoryCommand(drive, preloadDelivery),
-                                new InstantCommand(tertiaryRotation::goToInitialPosition),
-                                new RotatePrimary(primaryRotation, extension, 150, -0.6)
-                        ),
-                        new RotateTertiary(tertiaryRotation, 0.75),
-                        new InstantCommand(claw::open),
-                        new ParallelCommandGroup(
-                                new FollowTrajectoryCommand(drive, safePosition),
-                                new SequentialCommandGroup(
-                                        new WaitCommand(300),
-                                        new InstantCommand(claw::close)
-                                )
-                        ),
-                        new RotateTertiary(tertiaryRotation, 0.5),
-                        new PickPark(drive, sleeveColor, purple, orange, green)
+
+                        new FollowTrajectoryCommand(drive, orange),
+                        new PickPark(drive, sleeveColor, purple, green)
                         /*
                         new UnfoldArm(primaryRotation, tertiaryRotation, extension, limitSwitch),
                         new WaitCommand(500),
