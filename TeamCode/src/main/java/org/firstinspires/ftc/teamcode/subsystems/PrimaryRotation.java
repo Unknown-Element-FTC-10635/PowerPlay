@@ -19,16 +19,20 @@ public class PrimaryRotation extends SubsystemBase {
 
     private boolean slowLift = false;
 
+    private final int MAX_ANGLE = 171;
+
     public PrimaryRotation(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
         leftRotation = new Motor(hardwareMap, "leftPRotation");//hardwareMap.get(Motor.class, "leftPRotation");
         rightRotation = new Motor(hardwareMap, "SRotation");
-        leftBarEncoder = new Motor(hardwareMap, "fr").encoder;//hardwareMap.get(Motor.Encoder.class, "br");
+        leftBarEncoder = new Motor(hardwareMap, "fl").encoder;//hardwareMap.get(Motor.Encoder.class, "br");
         leftBarEncoder.reset();
 
         leftRotation.encoder = leftBarEncoder;
+        leftRotation.resetEncoder();
         rightRotation.encoder = leftBarEncoder;
+        rightRotation.resetEncoder();
 
         leftRotation.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rightRotation.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
@@ -39,13 +43,15 @@ public class PrimaryRotation extends SubsystemBase {
         leftRotation.setRunMode(Motor.RunMode.RawPower);
         //rightRotation.setRunMode(Motor.RunMode.RawPower);
 
-        if (angle < 170) {
+        if (angle < MAX_ANGLE) {
             // https://www.desmos.com/calculator/w8omojaitz
-            double multiplier = 1/(1+Math.pow(Math.E, -((1.0/3.0) * (170 - angle) - 3)));
+            double multiplier = 1/(1+Math.pow(Math.E, -((1.0/3.0) * (MAX_ANGLE - angle) - 3)));
             leftRotation.set(power * multiplier);
             rightRotation.set(power * multiplier);
+            telemetry.addData("Primary Power", power * multiplier);
         } else if (power < 0){
             leftRotation.set(power);
+            telemetry.addData("Primary Power", power);
         }
     }
 
@@ -61,16 +67,18 @@ public class PrimaryRotation extends SubsystemBase {
         rightRotation.set(setPower);
 
         this.targetAngle = targetAngle;
+        telemetry.addData("Primary Power", power);
+
     }
 
     @Override
     public void periodic() {
-        angle = leftBarEncoder.getPosition()* 0.17578*0.25+45.6;
+        angle = leftBarEncoder.getPosition()/22.8;
 
         if (slowLift) {
-            if (angle < 170) {
+            if (angle < MAX_ANGLE) {
                 // https://www.desmos.com/calculator/w8omojaitz
-                double multiplier = 1/(1+Math.pow(Math.E, -((1.0/3.0) * (170 - angle) - 3)));
+                double multiplier = 1/(1+Math.pow(Math.E, -((1.0/3.0) * (MAX_ANGLE - angle) - 3)));
                 leftRotation.set(setPower * multiplier);
                 rightRotation.set(setPower * multiplier);
             } else if (setPower < 0){
@@ -84,12 +92,14 @@ public class PrimaryRotation extends SubsystemBase {
             //rotateTo(lockAngle, 0.025);
         }
 
-        telemetry.addData("Primary Rotation Angle:", angle);
         telemetry.addData("Primary State", state);
+        telemetry.addData("Primary Rotation Angle", angle);
+        telemetry.addData("Primary Rotation Raw Value", leftBarEncoder.getPosition());
     }
 
     public boolean atTargetPosition() {
-        return (angle > targetAngle); // && rightRotation.atTargetPosition());
+        return ((targetAngle > 0 && angle > targetAngle) || (targetAngle < 0 && angle < targetAngle));
+        // && rightRotation.atTargetPosition());
     }
 
     public void stop() {

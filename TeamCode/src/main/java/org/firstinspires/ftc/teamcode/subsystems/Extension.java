@@ -19,6 +19,9 @@ public class Extension extends SubsystemBase {
         leftExtension = new Motor(hardwareMap, "leftExtension"); //hardwareMap.get(Motor.class, "leftExtension");
         rightExtension = new Motor(hardwareMap, "rightExtension"); //hardwareMap.get(Motor.class, "rightExtension");
         rightExtension.setInverted(true);
+
+        leftExtension.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        rightExtension.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
     }
 
     public void rotatePower(float power) {

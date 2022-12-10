@@ -39,8 +39,8 @@ public class Claw extends SubsystemBase {
     }
 
     public void open() {
-        leftRotation.setPosition(0.79);
-        rightRotation.setPosition(0.51);
+        leftRotation.setPosition(0.44);
+        rightRotation.setPosition(0.40);
 
         leftWheel.setPower(0.3);
         rightWheel.setPower(0.3);
@@ -49,8 +49,8 @@ public class Claw extends SubsystemBase {
     }
 
     public void close() {
-        leftRotation.setPosition(0.84);
-        rightRotation.setPosition(0.46);
+        leftRotation.setPosition(0.50);
+        rightRotation.setPosition(0.32);
 
         leftWheel.setPower(0.0);
         rightWheel.setPower(0.0);
@@ -69,5 +69,7 @@ public class Claw extends SubsystemBase {
         telemetry.addData("Left Claw", leftRotation.getPosition());
         telemetry.addData("Right Claw", rightRotation.getPosition());
 
+        telemetry.addData("Left Wheel", leftWheel.getPower());
+        telemetry.addData("Right Wheel", rightWheel.getPower());
     }
 }

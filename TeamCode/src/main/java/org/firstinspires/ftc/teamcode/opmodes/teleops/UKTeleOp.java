@@ -41,6 +41,7 @@ public class UKTeleOp extends OpMode {
     private boolean positionToggle = false;
 
     private double wheelMultiplier = 0.75;
+    private int robotDirection = 1;
 
     @Override
     public void init() {
@@ -71,12 +72,20 @@ public class UKTeleOp extends OpMode {
     public void start() {
         CommandScheduler.getInstance().registerSubsystem(primaryRotation,
                                                         tertiaryRotation, limitSwitch, extension, claw);
+
+        claw.open();
         //tertiaryRotation.setBeginAdjustment(true);
     }
 
     @Override
     public void loop() {
         loopTime.reset();
+
+        //if (claw.getCurrentState() == Claw.State.OPEN) {
+        //    wheelMultiplier = -1;
+        //} else if (claw.getCurrentState() == Claw.State.CLOSED) {
+        //    wheelMultiplier = 1;
+        //}
 
         try {
             previousGamepad1.copy(currentGamepad1);
@@ -88,10 +97,10 @@ public class UKTeleOp extends OpMode {
         }
 
         // Primary
-        backRight.setPower(((gamepad1.left_stick_y - gamepad1.left_stick_x) + gamepad1.right_stick_x) * wheelMultiplier);
-        frontLeft.setPower(((gamepad1.left_stick_y - gamepad1.left_stick_x) - gamepad1.right_stick_x) * wheelMultiplier);
-        backLeft.setPower(((gamepad1.left_stick_y + gamepad1.left_stick_x) - gamepad1.right_stick_x) * wheelMultiplier);
-        frontRight.setPower(((gamepad1.left_stick_y + gamepad1.left_stick_x) + gamepad1.right_stick_x) * wheelMultiplier);
+        backRight.setPower((((gamepad1.left_stick_y * robotDirection) - gamepad1.left_stick_x) + gamepad1.right_stick_x) * wheelMultiplier);
+        frontLeft.setPower((((gamepad1.left_stick_y * robotDirection) - gamepad1.left_stick_x) - gamepad1.right_stick_x) * wheelMultiplier);
+        backLeft.setPower((((gamepad1.left_stick_y * robotDirection) + gamepad1.left_stick_x) - gamepad1.right_stick_x) * wheelMultiplier * robotDirection);
+        frontRight.setPower((((gamepad1.left_stick_y * robotDirection) + gamepad1.left_stick_x) + gamepad1.right_stick_x) * wheelMultiplier * robotDirection);
 
         CommandScheduler.getInstance().run();
 
@@ -105,7 +114,17 @@ public class UKTeleOp extends OpMode {
                     primaryPreviouslyMoving = true;
                 }
 
-                primaryRotation.rotatePower(gamepad2.left_stick_y);
+                primaryRotation.rotatePower(gamepad2.left_stick_y * robotDirection);
+
+            } else if (Math.abs(gamepad2.right_stick_y) > 0.1) {
+                if (primaryPreviouslyMoving) {
+                    primaryRotation.setState(SubsystemState.MOVING);
+                } else {
+                    primaryRotation.setState(SubsystemState.STARTING);
+                    primaryPreviouslyMoving = true;
+                }
+
+                primaryRotation.rotatePower(gamepad2.right_stick_y * (float)0.25);
 
             } else {
                 primaryRotation.stop();
@@ -137,7 +156,7 @@ public class UKTeleOp extends OpMode {
 
         // Primary
         if (CommandScheduler.getInstance().requiring(extension) == null) {
-            extension.rotatePower((gamepad2.right_trigger - gamepad2.left_trigger) / 2);
+            extension.rotatePower((gamepad2.left_trigger - gamepad2.right_trigger) / (float)1.5);
         }
 
 

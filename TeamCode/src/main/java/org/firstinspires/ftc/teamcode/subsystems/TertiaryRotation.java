@@ -61,14 +61,14 @@ public class TertiaryRotation extends SubsystemBase {
         if (beginAdjustment) {
             double primaryAngle = primaryRotation.getAngle();
 
-            leftRotation.setPosition(((115 + primaryAngle)/360));
-            rightRotation.setPosition(((115 + primaryAngle)/360));
+            leftRotation.setPosition(0.34 + (0.35/90) * (180-primaryAngle));
+            rightRotation.setPosition(0.34 + (0.35/90) * (180-primaryAngle));
 
         }
 
         telemetry.addData("Tertiary Rotation (left) Angle:", leftRotation.getPosition());
         telemetry.addData("Tertiary Rotation (right) Angle:", rightRotation.getPosition());
 
-        telemetry.addData("Adjustment Value", 1-((90 + primaryRotation.getAngle())/360));
+        telemetry.addData("Adjustment Value", 0.34 + (0.35/90) * (180-primaryRotation.getAngle()));
     }
 }
