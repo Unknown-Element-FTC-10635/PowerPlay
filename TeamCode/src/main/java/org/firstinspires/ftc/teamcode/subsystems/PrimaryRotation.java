@@ -43,6 +43,11 @@ public class PrimaryRotation extends SubsystemBase {
         leftRotation.setRunMode(Motor.RunMode.RawPower);
         //rightRotation.setRunMode(Motor.RunMode.RawPower);
 
+        leftRotation.set(power);
+        rightRotation.set(power);
+        telemetry.addData("Primary Power", power);
+
+        /*
         if (angle < MAX_ANGLE) {
             // https://www.desmos.com/calculator/w8omojaitz
             double multiplier = 1/(1+Math.pow(Math.E, -((1.0/3.0) * (MAX_ANGLE - angle) - 3)));
@@ -52,7 +57,7 @@ public class PrimaryRotation extends SubsystemBase {
         } else if (power < 0){
             leftRotation.set(power);
             telemetry.addData("Primary Power", power);
-        }
+        }*/
     }
 
     public void rotateTo(int targetAngle, double power) {
@@ -74,17 +79,6 @@ public class PrimaryRotation extends SubsystemBase {
     @Override
     public void periodic() {
         angle = leftBarEncoder.getPosition()/22.8;
-
-        if (slowLift) {
-            if (angle < MAX_ANGLE) {
-                // https://www.desmos.com/calculator/w8omojaitz
-                double multiplier = 1/(1+Math.pow(Math.E, -((1.0/3.0) * (MAX_ANGLE - angle) - 3)));
-                leftRotation.set(setPower * multiplier);
-                rightRotation.set(setPower * multiplier);
-            } else if (setPower < 0){
-                leftRotation.set(setPower);
-            }
-        }
 
         if (state == SubsystemState.STOPPING) {
             lockAngle = angle;
