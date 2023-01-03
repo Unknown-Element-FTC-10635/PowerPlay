@@ -9,20 +9,14 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.commandgroups.UnfoldArm;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Extension;
 import org.firstinspires.ftc.teamcode.subsystems.LimitSwitch;
-import org.firstinspires.ftc.teamcode.subsystems.PrimaryRotation;
-import org.firstinspires.ftc.teamcode.subsystems.TertiaryRotation;
-import org.firstinspires.ftc.teamcode.util.SubsystemState;
 
 @TeleOp
 public class UKTeleOp extends OpMode {
     private DcMotor frontLeft, frontRight, backLeft, backRight;
 
-    private PrimaryRotation primaryRotation;
-    private TertiaryRotation tertiaryRotation;
     private LimitSwitch limitSwitch;
     private Extension extension;
     private Claw claw;
@@ -40,23 +34,21 @@ public class UKTeleOp extends OpMode {
     private boolean speedToggle = false;
     private boolean positionToggle = false;
 
-    private double wheelMultiplier = 0.75;
+    private double wheelMultiplier = 1;
     private int robotDirection = 1;
 
     @Override
     public void init() {
         // Drive Train
         frontLeft = hardwareMap.get(DcMotor.class, "fl");
-        frontRight = hardwareMap.get(DcMotor.class, "fr");
         backLeft = hardwareMap.get(DcMotor.class, "bl");
+        frontRight = hardwareMap.get(DcMotor.class, "fr");
         backRight = hardwareMap.get(DcMotor.class, "br");
 
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Subsystems
-        primaryRotation = new PrimaryRotation(hardwareMap, telemetry);
-        tertiaryRotation = new TertiaryRotation(hardwareMap, telemetry, primaryRotation);
         limitSwitch = new LimitSwitch(hardwareMap, telemetry, "primarySwitch");
         extension = new Extension(hardwareMap, telemetry);
         claw = new Claw(hardwareMap, telemetry);
@@ -70,8 +62,7 @@ public class UKTeleOp extends OpMode {
 
     @Override
     public void start() {
-        CommandScheduler.getInstance().registerSubsystem(primaryRotation,
-                                                        tertiaryRotation, limitSwitch, extension, claw);
+        CommandScheduler.getInstance().registerSubsystem(limitSwitch, extension, claw);
 
         claw.open();
         //tertiaryRotation.setBeginAdjustment(true);
@@ -104,39 +95,6 @@ public class UKTeleOp extends OpMode {
 
         CommandScheduler.getInstance().run();
 
-        // Secondary
-        if (CommandScheduler.getInstance().requiring(primaryRotation) == null) {
-            if (Math.abs(gamepad2.left_stick_y) > 0.1) {
-                if (primaryPreviouslyMoving) {
-                    primaryRotation.setState(SubsystemState.MOVING);
-                } else {
-                    primaryRotation.setState(SubsystemState.STARTING);
-                    primaryPreviouslyMoving = true;
-                }
-
-                primaryRotation.rotatePower(gamepad2.left_stick_y * robotDirection);
-
-            } else if (Math.abs(gamepad2.right_stick_y) > 0.1) {
-                if (primaryPreviouslyMoving) {
-                    primaryRotation.setState(SubsystemState.MOVING);
-                } else {
-                    primaryRotation.setState(SubsystemState.STARTING);
-                    primaryPreviouslyMoving = true;
-                }
-
-                primaryRotation.rotatePower(gamepad2.right_stick_y * (float)0.25);
-
-            } else {
-                primaryRotation.stop();
-                if (primaryPreviouslyMoving) {
-                    primaryRotation.setState(SubsystemState.STOPPING);
-                    primaryPreviouslyMoving = false;
-                } else if (primaryRotation.getState() != SubsystemState.UNKNOWN) {
-                    primaryRotation.setState(SubsystemState.STOPPED);
-                }
-            }
-        }
-
         if (currentGamepad1.cross && !previousGamepad1.cross) {
             clawToggle = !clawToggle;
         }
@@ -164,23 +122,6 @@ public class UKTeleOp extends OpMode {
             adjustmentToggle = !adjustmentToggle;
         }
 
-        // Secondary
-        if (CommandScheduler.getInstance().requiring(tertiaryRotation) == null) {
-            if (adjustmentToggle) {
-                tertiaryRotation.setBeginAdjustment(true);
-            } else {
-                tertiaryRotation.setBeginAdjustment(false);
-            }
-
-            if (!adjustmentToggle) {
-                if (gamepad1.right_bumper) {
-                    tertiaryRotation.increasePositiveDirection();
-                } else if (gamepad1.left_bumper) {
-                    tertiaryRotation.increaseNegativeDirection();
-                }
-            }
-        }
-
         // Primary
         if (currentGamepad1.right_stick_button && previousGamepad1.right_stick_button) {
             speedToggle = !speedToggle;
@@ -189,10 +130,6 @@ public class UKTeleOp extends OpMode {
             } else {
                 wheelMultiplier = 0.75;
             }
-        }
-
-        if (limitSwitch.isPressed()) {
-            primaryRotation.reset();
         }
 
         telemetry.addData("Adjusting", adjustmentToggle);
