@@ -23,13 +23,12 @@ public class UKTeleOp extends OpMode {
 
     private ElapsedTime loopTime;
 
-    private Gamepad currentGamepad1 = new Gamepad();
-    private Gamepad currentGamepad2 = new Gamepad();
-    private Gamepad previousGamepad1 = new Gamepad();
-    private Gamepad previousGamepad2 = new Gamepad();
+    private final Gamepad currentGamepad1 = new Gamepad();
+    private final Gamepad currentGamepad2 = new Gamepad();
+    private final Gamepad previousGamepad1 = new Gamepad();
+    private final Gamepad previousGamepad2 = new Gamepad();
 
     private boolean clawToggle = false;
-    private boolean adjustmentToggle = false;
     private boolean speedToggle = false;
     private double wheelMultiplier = 1;
 
@@ -106,11 +105,6 @@ public class UKTeleOp extends OpMode {
             extension.rotatePower((gamepad2.left_trigger - gamepad2.right_trigger) / (float)1.5);
         }
 
-
-        if (currentGamepad1.triangle && !previousGamepad1.triangle) {
-            adjustmentToggle = !adjustmentToggle;
-        }
-
         // Primary
         if (currentGamepad1.right_stick_button && previousGamepad1.right_stick_button) {
             speedToggle = !speedToggle;
@@ -121,7 +115,6 @@ public class UKTeleOp extends OpMode {
             }
         }
 
-        telemetry.addData("Adjusting", adjustmentToggle);
         telemetry.addData("Loop Time", loopTime.milliseconds());
     }
 
