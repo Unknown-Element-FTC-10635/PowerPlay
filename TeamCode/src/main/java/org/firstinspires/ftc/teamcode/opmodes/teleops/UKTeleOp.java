@@ -115,9 +115,9 @@ public class UKTeleOp extends OpMode {
         if (currentGamepad1.right_stick_button && previousGamepad1.right_stick_button) {
             speedToggle = !speedToggle;
             if (speedToggle) {
-                wheelMultiplier = 1;
-            } else {
                 wheelMultiplier = 0.75;
+            } else {
+                wheelMultiplier = 1;
             }
         }
 
