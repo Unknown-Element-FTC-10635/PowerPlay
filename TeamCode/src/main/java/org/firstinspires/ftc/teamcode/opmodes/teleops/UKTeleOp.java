@@ -28,14 +28,10 @@ public class UKTeleOp extends OpMode {
     private Gamepad previousGamepad1 = new Gamepad();
     private Gamepad previousGamepad2 = new Gamepad();
 
-    private boolean primaryPreviouslyMoving = false;
     private boolean clawToggle = false;
     private boolean adjustmentToggle = false;
     private boolean speedToggle = false;
-    private boolean positionToggle = false;
-
     private double wheelMultiplier = 1;
-    private int robotDirection = 1;
 
     @Override
     public void init() {
@@ -65,18 +61,11 @@ public class UKTeleOp extends OpMode {
         CommandScheduler.getInstance().registerSubsystem(limitSwitch, extension, claw);
 
         claw.open();
-        //tertiaryRotation.setBeginAdjustment(true);
     }
 
     @Override
     public void loop() {
         loopTime.reset();
-
-        //if (claw.getCurrentState() == Claw.State.OPEN) {
-        //    wheelMultiplier = -1;
-        //} else if (claw.getCurrentState() == Claw.State.CLOSED) {
-        //    wheelMultiplier = 1;
-        //}
 
         try {
             previousGamepad1.copy(currentGamepad1);
@@ -88,10 +77,10 @@ public class UKTeleOp extends OpMode {
         }
 
         // Primary
-        backRight.setPower((((gamepad1.left_stick_y * robotDirection) - gamepad1.left_stick_x) + gamepad1.right_stick_x) * wheelMultiplier);
-        frontLeft.setPower((((gamepad1.left_stick_y * robotDirection) - gamepad1.left_stick_x) - gamepad1.right_stick_x) * wheelMultiplier);
-        backLeft.setPower((((gamepad1.left_stick_y * robotDirection) + gamepad1.left_stick_x) - gamepad1.right_stick_x) * wheelMultiplier * robotDirection);
-        frontRight.setPower((((gamepad1.left_stick_y * robotDirection) + gamepad1.left_stick_x) + gamepad1.right_stick_x) * wheelMultiplier * robotDirection);
+        backRight.setPower(((gamepad1.left_stick_y - gamepad1.left_stick_x) + gamepad1.right_stick_x) * wheelMultiplier);
+        frontLeft.setPower(((gamepad1.left_stick_y - gamepad1.left_stick_x) - gamepad1.right_stick_x) * wheelMultiplier);
+        backLeft.setPower(((gamepad1.left_stick_y + gamepad1.left_stick_x) - gamepad1.right_stick_x) * wheelMultiplier);
+        frontRight.setPower(((gamepad1.left_stick_y + gamepad1.left_stick_x) + gamepad1.right_stick_x) * wheelMultiplier);
 
         CommandScheduler.getInstance().run();
 
