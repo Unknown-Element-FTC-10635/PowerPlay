@@ -12,12 +12,12 @@ public class WebcamTesting extends OpMode {
     @Override
     public void init() {
         webcam = new BaseWebcam(hardwareMap);
-        webcam.startSleeveDetection();
+        webcam.startStackDetection();
     }
 
     @Override
     public void loop() {
-        telemetry.addData("Sleeve Color", webcam.getSleeveColor());
+        telemetry.addData("Direction to Turn", webcam.getStackDirection());
         telemetry.update();
     }
 

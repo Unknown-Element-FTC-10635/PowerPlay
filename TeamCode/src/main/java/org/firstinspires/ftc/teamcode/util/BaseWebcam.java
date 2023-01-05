@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode.util;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.checkerframework.checker.units.qual.C;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.visionpipeline.ConeStackDetection;
 import org.firstinspires.ftc.teamcode.visionpipeline.SleeveDetection;
 import org.firstinspires.ftc.teamcode.visionpipeline.SleeveDetection.SleeveColor;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -20,6 +22,7 @@ public class BaseWebcam {
     private OpenCvWebcam webcam;
 
     private SleeveDetection sleeveDetection;
+    private ConeStackDetection coneStackDetection;
 
     public BaseWebcam(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
@@ -32,6 +35,15 @@ public class BaseWebcam {
 
     public SleeveColor getSleeveColor() {
         return sleeveDetection.getSleeveColor();
+    }
+
+    public void startStackDetection() {
+        coneStackDetection = new ConeStackDetection();
+        start(coneStackDetection);
+    }
+
+    public ConeStackDetection.StackDirections getStackDirection() {
+       return coneStackDetection.getDirection();
     }
 
     private void start(OpenCvPipeline pipeline) {
