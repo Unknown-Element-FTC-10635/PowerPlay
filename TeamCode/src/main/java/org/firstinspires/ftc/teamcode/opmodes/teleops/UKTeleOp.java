@@ -86,20 +86,16 @@ public class UKTeleOp extends OpMode {
 
         CommandScheduler.getInstance().run();
 
-        if (currentGamepad1.cross && !previousGamepad1.cross) {
-            clawToggle = !clawToggle;
-        }
 
         // Primary
         if (CommandScheduler.getInstance().requiring(claw) == null) {
-            if (clawToggle) {
-                if (claw.getCurrentState() != Claw.State.OPEN) {
+            if (currentGamepad1.cross && !previousGamepad1.cross) {
+                if (claw.getCurrentState() == Claw.State.OPEN) {
+                    claw.close();
+                } else if (claw.getCurrentState() == Claw.State.CLOSED) {
                     claw.open();
                 }
-            } else {
-                if (claw.getCurrentState() != Claw.State.CLOSED) {
-                    claw.close();
-                }
+                //clawToggle = !clawToggle;
             }
         }
 
@@ -124,7 +120,7 @@ public class UKTeleOp extends OpMode {
 
         if (CommandScheduler.getInstance().requiring(extension) == null) {
             if (gamepad1.right_bumper) {
-                extension.rotatePower(-0.75f);
+                extension.rotatePower(-1f);
             } else if (gamepad1.left_bumper) {
                 extension.rotatePower(0.5f);
             }

@@ -27,13 +27,13 @@ public class Claw extends SubsystemBase {
     }
 
     public void open() {
-        servo.setPosition(0.44);
+        servo.setPosition(0.35);
 
         currentState = State.OPEN;
     }
 
     public void close() {
-        servo.setPosition(0.50);
+        servo.setPosition(0.5);
 
         currentState = State.CLOSED;
     }
