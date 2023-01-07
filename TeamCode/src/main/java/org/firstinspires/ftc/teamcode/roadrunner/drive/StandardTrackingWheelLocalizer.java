@@ -32,29 +32,29 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
     public static double WHEEL_RADIUS = 1; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
 
-    public static double LATERAL_DISTANCE = 6.6533; // in; distance between the left and right wheels
+    public static double LATERAL_DISTANCE = 8.09427718348362; // in; distance between the left and right wheels
     public static double FORWARD_OFFSET = -1; // in; offset of the lateral wheel
 
-    public static double X_MULTIPLIER = 0.971156667 * 1.01117094; // Multiplier in the X direction
-    public static double Y_MULTIPLIER = 0.98908229; // Multiplier in the Y direction
+    public static double X_MULTIPLIER = 0.996220227; // Multiplier in the X direction
+    public static double Y_MULTIPLIER = 0.995291486; // Multiplier in the Y direction
 
     private Encoder leftEncoder, rightEncoder, frontEncoder;
 
     public StandardTrackingWheelLocalizer(HardwareMap hardwareMap) {
         super(Arrays.asList(
-                new Pose2d(0, LATERAL_DISTANCE / 2, 0), // left
+                new Pose2d(0, LATERAL_DISTANCE / 2,     0), // left
                 new Pose2d(0, -LATERAL_DISTANCE / 2, 0), // right
                 new Pose2d(FORWARD_OFFSET, 0, Math.toRadians(90)) // front
         ));
 
-        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "fr"));
-        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "bl"));
-        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "br"));
+        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "br"));
+        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "fl"));
+        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "bl"));
 
         // TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
-        leftEncoder.setDirection(Encoder.Direction.REVERSE);
-        rightEncoder.setDirection(Encoder.Direction.REVERSE);
-        //frontEncoder.setDirection(Encoder.Direction.REVERSE);
+        // leftEncoder.setDirection(Encoder.Direction.REVERSE);
+        // rightEncoder.setDirection(Encoder.Direction.REVERSE);
+        frontEncoder.setDirection(Encoder.Direction.REVERSE);
     }
 
     public static double encoderTicksToInches(double ticks) {

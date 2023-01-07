@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Extension;
 import org.firstinspires.ftc.teamcode.subsystems.LimitSwitch;
+import org.firstinspires.ftc.teamcode.subsystems.Rotation;
 
 @TeleOp
 public class UKTeleOp extends OpMode {
@@ -19,6 +20,7 @@ public class UKTeleOp extends OpMode {
 
     private LimitSwitch limitSwitch;
     private Extension extension;
+    private Rotation rotation;
     private Claw claw;
 
     private ElapsedTime loopTime;
@@ -46,6 +48,7 @@ public class UKTeleOp extends OpMode {
         // Subsystems
         limitSwitch = new LimitSwitch(hardwareMap, telemetry, "primarySwitch");
         extension = new Extension(hardwareMap, telemetry);
+        rotation = new Rotation(hardwareMap, telemetry);
         claw = new Claw(hardwareMap, telemetry);
 
         loopTime = new ElapsedTime();
@@ -112,6 +115,18 @@ public class UKTeleOp extends OpMode {
                 wheelMultiplier = 0.75;
             } else {
                 wheelMultiplier = 1;
+            }
+        }
+
+        if (CommandScheduler.getInstance().requiring(rotation) == null) {
+            rotation.manualRotation(gamepad1.right_trigger - gamepad1.left_trigger);
+        }
+
+        if (CommandScheduler.getInstance().requiring(extension) == null) {
+            if (gamepad1.right_bumper) {
+                extension.rotatePower(-0.75f);
+            } else if (gamepad1.left_bumper) {
+                extension.rotatePower(0.5f);
             }
         }
 
