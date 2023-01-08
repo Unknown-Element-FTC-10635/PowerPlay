@@ -6,15 +6,20 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.commandgroups.PickPark;
+import org.firstinspires.ftc.teamcode.commands.CloseClaw;
+import org.firstinspires.ftc.teamcode.commands.FaceConeStack;
 import org.firstinspires.ftc.teamcode.commands.FollowTrajectoryCommand;
+import org.firstinspires.ftc.teamcode.commands.OpenClaw;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Extension;
 import org.firstinspires.ftc.teamcode.subsystems.LimitSwitch;
+import org.firstinspires.ftc.teamcode.subsystems.Rotation;
 import org.firstinspires.ftc.teamcode.util.BaseWebcam;
 import org.firstinspires.ftc.teamcode.visionpipeline.SleeveDetection;
 
@@ -27,6 +32,7 @@ public class RightMedium extends CommandOpMode {
 
         // Subsystems
         Extension extension = new Extension(hardwareMap, telemetry);
+        Rotation rotation = new Rotation(hardwareMap, telemetry);
         LimitSwitch limitSwitch = new LimitSwitch(hardwareMap, telemetry, "primarySwitch");
         Claw claw = new Claw(hardwareMap, telemetry);
 
@@ -46,21 +52,36 @@ public class RightMedium extends CommandOpMode {
 
         TrajectorySequence safePosition = drive.trajectorySequenceBuilder(preloadDelivery.end())
                 .setReversed(true)
-                .splineTo(new Vector2d(-37, 50), Math.toRadians(90))
+                .splineTo(new Vector2d(-36, 50), Math.toRadians(90))
                 .build();
 
-        TrajectorySequence orange = drive.trajectorySequenceBuilder(start)
-                .lineTo(new Vector2d(-36, 38))
+        TrajectorySequence stackStart = drive.trajectorySequenceBuilder(safePosition.end())
+                .lineTo(new Vector2d(-36, 2))
+                .lineTo(new Vector2d(-36, 12))
+                .turn(Math.toRadians(-92))
+                .build();
+
+        TrajectorySequence approachPole = drive.trajectorySequenceBuilder(new Pose2d(-60, 14, Math.toRadians(180)))
+                //.setReversed(true)
+                .setReversed(true)
+                .splineTo(new Vector2d(-35, 15), Math.toRadians(-140))
+                .forward(4)
+                //.turn(Math.toRadians(135))
+                .build();
+
+        TrajectorySequence orange = drive.trajectorySequenceBuilder(approachPole.end())
+                .back(4)
+                .turn(Math.toRadians(-43))
                 .build();
 
         TrajectorySequence purple = drive.trajectorySequenceBuilder(orange.end())
-                .lineTo(new Vector2d(-11, 38))
-                .forward(3)
+                .lineTo(new Vector2d(-11, 12))
+                .strafeLeft(5)
                 .build();
 
         TrajectorySequence green = drive.trajectorySequenceBuilder(orange.end())
-                .lineTo(new Vector2d(-63, 38))
-                .forward(3)
+                .lineTo(new Vector2d(-63, 12))
+                .strafeLeft(5)
                 .build();
 
         telemetry.addLine("Starting Webcam");
@@ -79,41 +100,35 @@ public class RightMedium extends CommandOpMode {
         telemetry.addLine("Scheduling Tasks");
         telemetry.update();
 
-        register(limitSwitch, extension, claw);
+        register(limitSwitch, extension, claw, rotation);
 
         schedule(
-                new ParallelCommandGroup(
-                        new SequentialCommandGroup(
-                                new InstantCommand(baseWebcam::stop),
-                                new InstantCommand(claw::close),
-                                //new InstantCommand(tertiaryRotation::goToInitialPosition)
-                                //new ParallelCommandGroup(
-                                //new FollowTrajectoryCommand(drive, preloadDelivery)
-                                //new InstantCommand(tertiaryRotation::goToInitialPosition),
-                                //new RotatePrimary(primaryRotation, extension, -100, 0.6)
-                                //)
-                                new FollowTrajectoryCommand(drive, orange),
-                                new PickPark(drive, sleeveColor, purple, green)
-                        )
-                        /*
-                        new WaitCommand(500),
-                        new RotateTertiary(tertiaryRotation, 0.75),
-                        new InstantCommand(claw::open),
+                new SequentialCommandGroup(
+                        new OpenClaw(claw),
+                        new CloseClaw(claw),
+                        new WaitCommand(100),
                         new ParallelCommandGroup(
-                                new FollowTrajectoryCommand(drive, safePosition),
-                                new SequentialCommandGroup(
-                                        new WaitCommand(300),
-                                        new InstantCommand(claw::close)
-                                )
+                                new FollowTrajectoryCommand(drive, preloadDelivery)
                         ),
-                        new RotateTertiary(tertiaryRotation, 0.5),
-                        new PickPark(drive, sleeveColor, purple, orange, green)
-                        /*
-                        new UnfoldArm(primaryRotation, tertiaryRotation, extension, limitSwitch),
+                        new OpenClaw(claw),
                         new WaitCommand(500),
-                        new InstantCommand(() -> primaryRotation.setSlowLift(true)),
-                        new RotatePrimary(primaryRotation, extension,100, -0.4)
-                )
+                        new FollowTrajectoryCommand(drive, safePosition),
+                        new FollowTrajectoryCommand(drive, stackStart),
+                        new InstantCommand(baseWebcam::switchPipelineConeStack),
+                        new FaceConeStack(drive, baseWebcam),
+                        new ParallelCommandGroup(
+                                new WaitCommand(1000),
+                                new CloseClaw(claw)
+                        ),
+                        new FollowTrajectoryCommand(drive, approachPole),
+                        new ParallelCommandGroup(
+                            new WaitCommand(1000),
+                            new OpenClaw(claw)
+                        ),
+                        //new FollowTrajectoryCommand(drive, orange),
+                        new PickPark(drive, sleeveColor, purple, green)
+                        /*
+                        new PickPark(drive, sleeveColor, purple, green)
                          */
                 )
         );

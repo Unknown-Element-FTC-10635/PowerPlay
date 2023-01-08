@@ -46,6 +46,10 @@ public class BaseWebcam {
        return coneStackDetection.getDirection();
     }
 
+    public ConeStackDetection.StackEstimate getFrameEstimate() {
+        return coneStackDetection.getFrameEstimate();
+    }
+
     private void start(OpenCvPipeline pipeline) {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Base"), cameraMonitorViewId);
@@ -75,5 +79,10 @@ public class BaseWebcam {
 
     public void stop() {
         webcam.stopStreaming();
+    }
+
+    public void switchPipelineConeStack() {
+        coneStackDetection = new ConeStackDetection();
+        webcam.setPipeline(coneStackDetection);
     }
 }

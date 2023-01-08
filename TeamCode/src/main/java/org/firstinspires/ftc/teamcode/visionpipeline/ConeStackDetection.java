@@ -16,21 +16,28 @@ import java.util.Comparator;
 import java.util.List;
 
 public class ConeStackDetection extends OpenCvPipeline {
-    private final Scalar LOWER_BLUE = new Scalar(100, 20, 20);
+    private final Scalar LOWER_BLUE = new Scalar(100, 70, 90);
     private final Scalar UPPER_BLUE = new Scalar(130, 255, 255);
 
-    private final Rect BUFFERED_CENTER = new Rect(300, 0, 60, 480);
+    private final Rect BUFFERED_CENTER = new Rect(230, 0, 80, 480);
 
     private Mat proc = new Mat();
     private Mat blue = new Mat();
 
     private StackDirections direction = StackDirections.UNKNOWN;
+    private StackEstimate estimate = StackEstimate.EMPTY;
 
     public enum StackDirections {
         LEFT,
         RIGHT,
         CENTER,
         UNKNOWN
+    }
+
+    public enum StackEstimate {
+        EMPTY,
+        NORMAL,
+        FILLED
     }
 
     @Override
@@ -40,8 +47,15 @@ public class ConeStackDetection extends OpenCvPipeline {
 
         Core.inRange(proc, LOWER_BLUE, UPPER_BLUE, blue);
 
-        // 10% of a 640x480 image
-        if (Core.countNonZero(blue) > 30720) {
+        // 5% of a 640x480 image
+        if (Core.countNonZero(blue) > 15360) {
+            // 15% of a 640x480 image
+            if (Core.countNonZero(blue) > 46080) {
+                estimate = StackEstimate.FILLED;
+            } else {
+                estimate = StackEstimate.NORMAL;
+            }
+
             List<MatOfPoint> contours = new ArrayList<>();
             Mat hierarchy = new Mat();
             Imgproc.findContours(blue, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
@@ -71,6 +85,7 @@ public class ConeStackDetection extends OpenCvPipeline {
             }
         } else {
             direction = StackDirections.UNKNOWN;
+            estimate = StackEstimate.EMPTY;
         }
 
         Scalar boxColor = direction == StackDirections.CENTER ? new Scalar(0, 255, 0) : new Scalar(255, 0, 0);
@@ -80,5 +95,9 @@ public class ConeStackDetection extends OpenCvPipeline {
 
     public StackDirections getDirection() {
         return direction;
+    }
+
+    public StackEstimate getFrameEstimate() {
+        return estimate;
     }
 }

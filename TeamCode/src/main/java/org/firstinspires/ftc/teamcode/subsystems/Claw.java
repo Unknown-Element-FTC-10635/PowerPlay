@@ -9,7 +9,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Claw extends SubsystemBase {
     public enum State {
         OPEN,
-        CLOSED
+        CLOSED,
+        UNKNOWN
     }
 
     private final Telemetry telemetry;
@@ -23,7 +24,7 @@ public class Claw extends SubsystemBase {
 
         servo = hardwareMap.get(Servo.class, "claw"); //new SimpleServo(hardwareMap, "leftClaw", 0, 180, AngleUnit.DEGREES);
 
-        currentState = State.CLOSED;
+        currentState = State.UNKNOWN;
     }
 
     public void open() {
@@ -33,7 +34,7 @@ public class Claw extends SubsystemBase {
     }
 
     public void close() {
-        servo.setPosition(0.5);
+        servo.setPosition(0.51);
 
         currentState = State.CLOSED;
     }
