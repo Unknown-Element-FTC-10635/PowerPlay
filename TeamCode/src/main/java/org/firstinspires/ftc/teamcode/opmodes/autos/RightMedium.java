@@ -9,11 +9,15 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.teamcode.commandgroups.HighGoal;
+import org.firstinspires.ftc.teamcode.commandgroups.MediumGoal;
 import org.firstinspires.ftc.teamcode.commandgroups.PickPark;
+import org.firstinspires.ftc.teamcode.commandgroups.RotateHome;
 import org.firstinspires.ftc.teamcode.commands.CloseClaw;
 import org.firstinspires.ftc.teamcode.commands.FaceConeStack;
 import org.firstinspires.ftc.teamcode.commands.FollowTrajectoryCommand;
 import org.firstinspires.ftc.teamcode.commands.OpenClaw;
+import org.firstinspires.ftc.teamcode.commands.Rotate;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
@@ -48,20 +52,25 @@ public class RightMedium extends CommandOpMode {
 
         TrajectorySequence preloadDelivery = drive.trajectorySequenceBuilder(start)
                 .splineTo(new Vector2d(-30, 37), Math.toRadians(-54))
+                .forward(4)
                 .build();
 
         TrajectorySequence safePosition = drive.trajectorySequenceBuilder(preloadDelivery.end())
                 .setReversed(true)
-                .splineTo(new Vector2d(-36, 50), Math.toRadians(90))
+                .splineTo(new Vector2d(-35, 50), Math.toRadians(90))
                 .build();
 
         TrajectorySequence stackStart = drive.trajectorySequenceBuilder(safePosition.end())
-                .lineTo(new Vector2d(-36, 2))
-                .lineTo(new Vector2d(-36, 12))
+                .lineTo(new Vector2d(-35, 2))
+                .lineTo(new Vector2d(-35, 14))
                 .turn(Math.toRadians(-92))
                 .build();
 
-        TrajectorySequence approachPole = drive.trajectorySequenceBuilder(new Pose2d(-60, 14, Math.toRadians(180)))
+        TrajectorySequence approachStack = drive.trajectorySequenceBuilder(stackStart.end())
+                .forward(5)
+                .build();
+
+        TrajectorySequence approachPole = drive.trajectorySequenceBuilder(approachStack.end())
                 //.setReversed(true)
                 .setReversed(true)
                 .splineTo(new Vector2d(-35, 15), Math.toRadians(-140))
@@ -80,7 +89,7 @@ public class RightMedium extends CommandOpMode {
                 .build();
 
         TrajectorySequence green = drive.trajectorySequenceBuilder(orange.end())
-                .lineTo(new Vector2d(-63, 12))
+                .lineTo(new Vector2d(-60, 12))
                 .strafeLeft(5)
                 .build();
 
@@ -106,21 +115,34 @@ public class RightMedium extends CommandOpMode {
                 new SequentialCommandGroup(
                         new OpenClaw(claw),
                         new CloseClaw(claw),
-                        new WaitCommand(100),
+                        new WaitCommand(250),
                         new ParallelCommandGroup(
-                                new FollowTrajectoryCommand(drive, preloadDelivery)
+                                new FollowTrajectoryCommand(drive, preloadDelivery),
+                                new MediumGoal(rotation, claw)
                         ),
+                        new WaitCommand(300),
                         new OpenClaw(claw),
-                        new WaitCommand(500),
                         new FollowTrajectoryCommand(drive, safePosition),
-                        new FollowTrajectoryCommand(drive, stackStart),
-                        new InstantCommand(baseWebcam::switchPipelineConeStack),
-                        new FaceConeStack(drive, baseWebcam),
                         new ParallelCommandGroup(
-                                new WaitCommand(1000),
+                                new SequentialCommandGroup(
+                                        new WaitCommand(200),
+                                        new RotateHome(rotation)
+                                ),
+                                new FollowTrajectoryCommand(drive, stackStart),
+                                new InstantCommand(baseWebcam::switchPipelineConeStack)
+                        ),
+                        new FaceConeStack(drive, baseWebcam),
+                        new OpenClaw(claw),
+                        new Rotate(rotation, 30, 0.05),
+                        new FollowTrajectoryCommand(drive, approachStack),
+                        new ParallelCommandGroup(
+                                new WaitCommand(250),
                                 new CloseClaw(claw)
                         ),
-                        new FollowTrajectoryCommand(drive, approachPole),
+                        new ParallelCommandGroup(
+                                new FollowTrajectoryCommand(drive, approachPole),
+                                new MediumGoal(rotation, claw)
+                        ),
                         new ParallelCommandGroup(
                             new WaitCommand(1000),
                             new OpenClaw(claw)

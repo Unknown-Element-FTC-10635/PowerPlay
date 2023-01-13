@@ -9,6 +9,10 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.commandgroups.HighGoal;
+import org.firstinspires.ftc.teamcode.commandgroups.LowGoal;
+import org.firstinspires.ftc.teamcode.commandgroups.MediumGoal;
+import org.firstinspires.ftc.teamcode.commandgroups.Substation;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Extension;
 import org.firstinspires.ftc.teamcode.subsystems.LimitSwitch;
@@ -30,9 +34,8 @@ public class UKTeleOp extends OpMode {
     private final Gamepad previousGamepad1 = new Gamepad();
     private final Gamepad previousGamepad2 = new Gamepad();
 
-    private boolean clawToggle = false;
     private boolean speedToggle = false;
-    private double wheelMultiplier = 1;
+    private double wheelMultiplier = 0.8;
 
     @Override
     public void init() {
@@ -53,14 +56,13 @@ public class UKTeleOp extends OpMode {
 
         loopTime = new ElapsedTime();
         loopTime.startTime();
-
         telemetry.addLine("Waiting for start");
         telemetry.update();
     }
 
     @Override
     public void start() {
-        CommandScheduler.getInstance().registerSubsystem(limitSwitch, extension, claw);
+        CommandScheduler.getInstance().registerSubsystem(rotation, limitSwitch, extension, claw);
 
         claw.open();
     }
@@ -84,6 +86,24 @@ public class UKTeleOp extends OpMode {
         backLeft.setPower(((gamepad1.left_stick_y + gamepad1.left_stick_x) - gamepad1.right_stick_x) * wheelMultiplier);
         frontRight.setPower(((gamepad1.left_stick_y + gamepad1.left_stick_x) + gamepad1.right_stick_x) * wheelMultiplier);
 
+
+        if (currentGamepad1.triangle && !previousGamepad1.triangle) {
+            CommandScheduler.getInstance().schedule(new HighGoal(rotation, extension, claw));
+        }
+
+        if (currentGamepad1.square && !previousGamepad1.square) {
+            CommandScheduler.getInstance().schedule(new LowGoal(rotation, claw));
+        }
+
+        if (currentGamepad1.circle && !previousGamepad1.circle) {
+            CommandScheduler.getInstance().schedule(new MediumGoal(rotation, claw));
+        }
+
+        if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down) {
+            CommandScheduler.getInstance().schedule(new Substation(rotation, extension, limitSwitch, claw));
+        }
+
+
         CommandScheduler.getInstance().run();
 
 
@@ -100,17 +120,12 @@ public class UKTeleOp extends OpMode {
         }
 
         // Primary
-        if (CommandScheduler.getInstance().requiring(extension) == null) {
-            extension.rotatePower((gamepad2.left_trigger - gamepad2.right_trigger) / (float)1.5);
-        }
-
-        // Primary
         if (currentGamepad1.right_stick_button && previousGamepad1.right_stick_button) {
             speedToggle = !speedToggle;
             if (speedToggle) {
-                wheelMultiplier = 0.75;
-            } else {
                 wheelMultiplier = 1;
+            } else {
+                wheelMultiplier = 0.8;
             }
         }
 
@@ -123,6 +138,8 @@ public class UKTeleOp extends OpMode {
                 extension.rotatePower(-1f);
             } else if (gamepad1.left_bumper) {
                 extension.rotatePower(0.5f);
+            } else {
+                extension.stop();
             }
         }
 
