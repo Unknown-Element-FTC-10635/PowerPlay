@@ -16,7 +16,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class ConeStackDetection extends OpenCvPipeline {
-    private final Scalar LOWER_BLUE = new Scalar(100, 70, 90);
+    private final Scalar LOWER_BLUE = new Scalar(100, 70, 80);
     private final Scalar UPPER_BLUE = new Scalar(130, 255, 255);
 
     private final Rect BUFFERED_CENTER = new Rect(230, 0, 80, 480);
@@ -68,6 +68,7 @@ public class ConeStackDetection extends OpenCvPipeline {
                     return (area2 - area1);
                 }
             });
+
             if (!contours.isEmpty()) {
                 Rect coneRect = Imgproc.boundingRect(contours.get(0));
                 int centerX = coneRect.x + (coneRect.width / 2);

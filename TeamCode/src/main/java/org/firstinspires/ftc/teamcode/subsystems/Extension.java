@@ -36,7 +36,7 @@ public class Extension extends SubsystemBase {
         leftExtension.setRunMode(Motor.RunMode.PositionControl);
         rightExtension.setRunMode(Motor.RunMode.PositionControl);
 
-        targetInches = inches / 7.0314986;
+        targetInches = inches / 3.92699082;
         leftExtension.setTargetDistance(targetInches);
         rightExtension.setTargetDistance(targetInches);
 

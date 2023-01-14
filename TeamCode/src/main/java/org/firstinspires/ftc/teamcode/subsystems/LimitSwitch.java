@@ -11,9 +11,12 @@ public class LimitSwitch extends SubsystemBase {
 
     private final Telemetry telemetry;
 
+    private final String name;
+
     public LimitSwitch(HardwareMap hardwareMap, Telemetry telemetry, String name) {
         this.limitSwitch = hardwareMap.get(DigitalChannel.class , name);
         this.telemetry = telemetry;
+        this.name = name;
     }
 
     public boolean isPressed() {
@@ -22,6 +25,6 @@ public class LimitSwitch extends SubsystemBase {
 
     @Override
     public void periodic() {
-        telemetry.addData("Limit Switch Status:", limitSwitch.getState());
+        telemetry.addData(name + " Status:", limitSwitch.getState());
     }
 }

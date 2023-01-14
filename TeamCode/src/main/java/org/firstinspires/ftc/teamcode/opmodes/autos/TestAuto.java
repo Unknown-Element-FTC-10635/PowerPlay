@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Extension;
 import org.firstinspires.ftc.teamcode.subsystems.LimitSwitch;
 import org.firstinspires.ftc.teamcode.subsystems.Rotation;
+import org.firstinspires.ftc.teamcode.util.CurrentOpmode;
 
 @Autonomous
 public class TestAuto extends CommandOpMode {
@@ -23,17 +24,20 @@ public class TestAuto extends CommandOpMode {
         Extension extension = new Extension(hardwareMap, telemetry);
         Rotation rotation = new Rotation(hardwareMap, telemetry);
         LimitSwitch limitSwitch = new LimitSwitch(hardwareMap, telemetry, "primarySwitch");
+        LimitSwitch rotationSW = new LimitSwitch(hardwareMap, telemetry, "rotationSW");
         Claw claw = new Claw(hardwareMap, telemetry);
 
-        register(limitSwitch, extension, claw, rotation);
+        register(limitSwitch, extension, claw, rotation, rotationSW);
+
+        CurrentOpmode.setCurrentOpmode(CurrentOpmode.OpMode.AUTO);
 
         waitForStart();
 
         schedule(
                 new SequentialCommandGroup(
-                        new MediumGoal(rotation, claw),
+                        new MediumGoal(rotation, rotationSW, claw),
                         new WaitCommand(2000),
-                        new RotateHome(rotation)
+                        new RotateHome(rotation, rotationSW)
                 )
         );
     }

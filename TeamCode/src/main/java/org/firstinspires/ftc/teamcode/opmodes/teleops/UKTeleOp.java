@@ -17,12 +17,13 @@ import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Extension;
 import org.firstinspires.ftc.teamcode.subsystems.LimitSwitch;
 import org.firstinspires.ftc.teamcode.subsystems.Rotation;
+import org.firstinspires.ftc.teamcode.util.CurrentOpmode;
 
 @TeleOp
 public class UKTeleOp extends OpMode {
     private DcMotor frontLeft, frontRight, backLeft, backRight;
 
-    private LimitSwitch limitSwitch;
+    private LimitSwitch extensionLimitSwitch, rotationLimitSwitch;
     private Extension extension;
     private Rotation rotation;
     private Claw claw;
@@ -39,6 +40,8 @@ public class UKTeleOp extends OpMode {
 
     @Override
     public void init() {
+        CurrentOpmode.setCurrentOpmode(CurrentOpmode.OpMode.TELEOP);
+
         // Drive Train
         frontLeft = hardwareMap.get(DcMotor.class, "fl");
         backLeft = hardwareMap.get(DcMotor.class, "bl");
@@ -49,7 +52,8 @@ public class UKTeleOp extends OpMode {
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Subsystems
-        limitSwitch = new LimitSwitch(hardwareMap, telemetry, "primarySwitch");
+        extensionLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "primarySwitch");
+        rotationLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "rotationSW");
         extension = new Extension(hardwareMap, telemetry);
         rotation = new Rotation(hardwareMap, telemetry);
         claw = new Claw(hardwareMap, telemetry);
@@ -62,7 +66,7 @@ public class UKTeleOp extends OpMode {
 
     @Override
     public void start() {
-        CommandScheduler.getInstance().registerSubsystem(rotation, limitSwitch, extension, claw);
+        CommandScheduler.getInstance().registerSubsystem(rotation, rotationLimitSwitch, extensionLimitSwitch, extension, claw);
 
         claw.open();
     }
@@ -88,19 +92,19 @@ public class UKTeleOp extends OpMode {
 
 
         if (currentGamepad1.triangle && !previousGamepad1.triangle) {
-            CommandScheduler.getInstance().schedule(new HighGoal(rotation, extension, claw));
+            CommandScheduler.getInstance().schedule(new HighGoal(rotation, rotationLimitSwitch, extension, claw));
         }
 
         if (currentGamepad1.square && !previousGamepad1.square) {
-            CommandScheduler.getInstance().schedule(new LowGoal(rotation, claw));
+            CommandScheduler.getInstance().schedule(new LowGoal(rotation, rotationLimitSwitch, claw));
         }
 
         if (currentGamepad1.circle && !previousGamepad1.circle) {
-            CommandScheduler.getInstance().schedule(new MediumGoal(rotation, claw));
+            CommandScheduler.getInstance().schedule(new MediumGoal(rotation, rotationLimitSwitch, claw));
         }
 
         if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down) {
-            CommandScheduler.getInstance().schedule(new Substation(rotation, extension, limitSwitch, claw));
+            CommandScheduler.getInstance().schedule(new Substation(rotation, extension, extensionLimitSwitch, rotationLimitSwitch, claw));
         }
 
 
@@ -130,17 +134,25 @@ public class UKTeleOp extends OpMode {
         }
 
         if (CommandScheduler.getInstance().requiring(rotation) == null) {
-            rotation.manualRotation(gamepad1.right_trigger - gamepad1.left_trigger);
+            if (gamepad2.right_trigger - gamepad2.left_trigger != 0) {
+                rotation.manualRotation(gamepad2.right_trigger - gamepad2.left_trigger);
+            } else {
+                rotation.stop();
+            }
         }
 
         if (CommandScheduler.getInstance().requiring(extension) == null) {
-            if (gamepad1.right_bumper) {
+            if (gamepad2.right_bumper) {
                 extension.rotatePower(-1f);
-            } else if (gamepad1.left_bumper) {
+            } else if (gamepad2.left_bumper) {
                 extension.rotatePower(0.5f);
             } else {
                 extension.stop();
             }
+        }
+
+        if (rotationLimitSwitch.isPressed()) {
+            rotation.reset();
         }
 
         telemetry.addData("Loop Time", loopTime.milliseconds());

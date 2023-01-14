@@ -11,16 +11,16 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 public class SleeveDetection extends OpenCvPipeline {
-    private final Scalar LOWER_GREEN = new Scalar(40, 50, 70);
-    private final Scalar UPPER_GREEN = new Scalar(65, 245, 245);
+    private final Scalar LOWER_GREEN = new Scalar(40, 10, 10);
+    private final Scalar UPPER_GREEN = new Scalar(80, 255, 255);
 
-    private final Scalar LOWER_ORANGE = new Scalar(10, 50, 70);
-    private final Scalar UPPER_ORANGE = new Scalar(35, 245, 245);
+    private final Scalar LOWER_ORANGE = new Scalar(10, 20, 40);
+    private final Scalar UPPER_ORANGE = new Scalar(35, 255, 255);
 
-    private final Scalar LOWER_PURPLE = new Scalar(130, 50, 70);
-    private final Scalar UPPER_PURPLE = new Scalar(160, 245, 245);
+    private final Scalar LOWER_PURPLE = new Scalar(130, 20, 40);
+    private final Scalar UPPER_PURPLE = new Scalar(160, 255, 255);
 
-    private final Rect AREA = new Rect(235, 220, 150, 120);
+    private final Rect AREA = new Rect(235, 220, 150, 110);
 
     private Mat green = new Mat();
     private Mat orange = new Mat();

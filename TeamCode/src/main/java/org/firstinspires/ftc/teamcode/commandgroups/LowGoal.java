@@ -8,11 +8,11 @@ import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.LimitSwitch;
 import org.firstinspires.ftc.teamcode.subsystems.Rotation;
 
-public class MediumGoal extends ParallelCommandGroup {
-    public MediumGoal(Rotation rotation, LimitSwitch limitSwitch, Claw claw) {
+public class LowGoal extends ParallelCommandGroup {
+    public LowGoal(Rotation rotation, LimitSwitch limitSwitch, Claw claw) {
         addCommands(
                 new CloseClaw(claw),
-                new Rotate(rotation, limitSwitch, 125, 0.01)
+                new Rotate(rotation, limitSwitch,50, 0.35)
         );
     }
 }
