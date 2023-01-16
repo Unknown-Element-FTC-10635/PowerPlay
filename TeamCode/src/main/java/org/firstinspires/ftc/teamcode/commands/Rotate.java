@@ -11,16 +11,17 @@ public class Rotate extends CommandBase {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     private final Rotation primaryRotation;
-    private final LimitSwitch limitSwitch;
+    private final LimitSwitch bottomSwitch, topSwitch;
 
     private final int targetAngle;
     private final double speed;
 
-    public Rotate(Rotation rotation, LimitSwitch limitSwitch, int targetAngle, double speed) {
-        addRequirements(rotation, limitSwitch);
+    public Rotate(Rotation rotation, LimitSwitch bottomSwitch, LimitSwitch topSwitch, int targetAngle, double speed) {
+        addRequirements(rotation, bottomSwitch);
 
         this.primaryRotation = rotation;
-        this.limitSwitch = limitSwitch;
+        this.bottomSwitch = bottomSwitch;
+        this.topSwitch = topSwitch;
         this.targetAngle = targetAngle;
         this.speed = speed;
     }
@@ -36,8 +37,11 @@ public class Rotate extends CommandBase {
         if (primaryRotation.atTargetPosition()) {
             logger.info("Finished Rotation from atTargetPosition()");
             return true;
-        } else if (!primaryRotation.isGoingUp() && limitSwitch.isPressed()) {
-            logger.info("Finished Rotation from Limit Switch");
+        } else if (!primaryRotation.isGoingUp() && bottomSwitch.isPressed()) {
+            logger.info("Finished Rotation from Bottom Limit Switch");
+            return true;
+        } else if (primaryRotation.isGoingUp() && topSwitch.isPressed()) {
+            logger.info("Finished Rotation from Top Limit Switch");
             return true;
         } else {
             return false;
@@ -47,7 +51,7 @@ public class Rotate extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         primaryRotation.stop();
-        if (limitSwitch.isPressed()) {
+        if (bottomSwitch.isPressed()) {
             primaryRotation.reset();
         }
         logger.info("Ending at current angle: " + primaryRotation.getAngle());

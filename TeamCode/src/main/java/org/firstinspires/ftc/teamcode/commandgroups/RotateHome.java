@@ -13,12 +13,12 @@ import java.util.logging.Logger;
 public class RotateHome extends SequentialCommandGroup {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
-    public RotateHome(Rotation rotation, LimitSwitch limitSwitch) {
+    public RotateHome(Rotation rotation, LimitSwitch bottomSwitch, LimitSwitch topSwitch) {
         logger.info("Scheduling Rotate Home");
         addCommands(
-                //new Rotate(rotation, limitSwitch, 10, 0.005),
+                //new Rotate(rotation, bottomSwitch, 10, 0.005),
                 //new WaitCommand(200),
-                new Rotate(rotation, limitSwitch, 1, 0.005)
+                new Rotate(rotation, bottomSwitch, topSwitch, 1, 0.005)
         );
     }
 }

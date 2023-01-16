@@ -41,7 +41,8 @@ public class LeftMedium extends CommandOpMode {
         Extension extension = new Extension(hardwareMap, telemetry);
         Rotation rotation = new Rotation(hardwareMap, telemetry);
         LimitSwitch limitSwitch = new LimitSwitch(hardwareMap, telemetry, "primarySwitch");
-        LimitSwitch rotationSwitch = new LimitSwitch(hardwareMap, telemetry, "rotationSW");
+        LimitSwitch rotationBottomSwitch = new LimitSwitch(hardwareMap, telemetry, "rotationBSW");
+        LimitSwitch rotationTopSwitch = new LimitSwitch(hardwareMap, telemetry, "rotationTSW");
         Claw claw = new Claw(hardwareMap, telemetry);
 
         BaseWebcam baseWebcam = new BaseWebcam(hardwareMap);
@@ -122,7 +123,7 @@ public class LeftMedium extends CommandOpMode {
         telemetry.addLine("Scheduling Tasks");
         telemetry.update();
 
-        register(limitSwitch, extension, claw, rotation, rotationSwitch);
+        register(limitSwitch, extension, claw, rotation, rotationTopSwitch, rotationBottomSwitch);
 
         schedule(
                 new SequentialCommandGroup(
@@ -132,21 +133,21 @@ public class LeftMedium extends CommandOpMode {
                         new WaitCommand(500),
                         new ParallelCommandGroup(
                                 new FollowTrajectoryCommand(drive, preloadDelivery),
-                                new MediumGoal(rotation, rotationSwitch, claw)
+                                new MediumGoal(rotation, rotationBottomSwitch, rotationTopSwitch, claw)
                         ),
                         new WaitCommand(300),
                         new OpenClaw(claw),
                         new ParallelCommandGroup(
                                 new SequentialCommandGroup(
                                         new WaitCommand(300),
-                                        new RotateHome(rotation, rotationSwitch)
+                                        new RotateHome(rotation, rotationBottomSwitch, rotationTopSwitch)
                                 ),
                                 new FollowTrajectoryCommand(drive, safePosition)
                                 //new InstantCommand(baseWebcam::switchPipelineConeStack)
                         ),
                         new FollowTrajectoryCommand(drive, stackStart),
                         new OpenClaw(claw),
-                        new Rotate(rotation, rotationSwitch, 30, 0.1),
+                        new Rotate(rotation, rotationBottomSwitch, rotationTopSwitch, 30, 0.1),
                         new FollowTrajectoryCommand(drive, approachStack),
                         new ParallelCommandGroup(
                                 new WaitCommand(250),
@@ -155,8 +156,8 @@ public class LeftMedium extends CommandOpMode {
                         new ParallelCommandGroup(
                                 new SequentialCommandGroup(
                                         new WaitCommand(50),
-                                        new Rotate(rotation, rotationSwitch, 90, 0.2),
-                                        new Rotate(rotation, rotationSwitch, 125, 0.05)
+                                        new Rotate(rotation, rotationBottomSwitch, rotationTopSwitch, 90, 0.2),
+                                        new Rotate(rotation, rotationBottomSwitch, rotationTopSwitch, 125, 0.05)
                                 ),
                                 new FollowTrajectoryCommand(drive, approachPole)
                         ),
@@ -165,7 +166,7 @@ public class LeftMedium extends CommandOpMode {
                         new WaitCommand(250),
                         new FollowTrajectoryCommand(drive, backAwayPole),
                         new PickPark(drive, sleeveColor, purple, orange, green),
-                        new RotateHome(rotation, rotationSwitch)
+                        new RotateHome(rotation, rotationBottomSwitch, rotationTopSwitch)
                 )
         );
 
