@@ -21,9 +21,11 @@ import org.firstinspires.ftc.teamcode.util.CurrentOpmode;
 
 @TeleOp
 public class UKTeleOp extends OpMode {
+    private static final double CLAW_CHANGE_STATE_ANGLE = 140;
+
     private DcMotor frontLeft, frontRight, backLeft, backRight;
 
-    private LimitSwitch extensionLimitSwitch, rotationLimitSwitch;
+    private LimitSwitch extensionLimitSwitch, rotationBottomLimitSwitch, rotationTopLimitSwitch;
     private Extension extension;
     private Rotation rotation;
     private Claw claw;
@@ -53,7 +55,8 @@ public class UKTeleOp extends OpMode {
 
         // Subsystems
         extensionLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "primarySwitch");
-        rotationLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "rotationSW");
+        rotationBottomLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "rotationBSW");
+        rotationTopLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "rotationTSW");
         extension = new Extension(hardwareMap, telemetry);
         rotation = new Rotation(hardwareMap, telemetry);
         claw = new Claw(hardwareMap, telemetry);
@@ -66,9 +69,9 @@ public class UKTeleOp extends OpMode {
 
     @Override
     public void start() {
-        CommandScheduler.getInstance().registerSubsystem(rotation, rotationLimitSwitch, extensionLimitSwitch, extension, claw);
+        CommandScheduler.getInstance().registerSubsystem(rotation, rotationBottomLimitSwitch, extensionLimitSwitch, extension, claw);
 
-        claw.open();
+        claw.openBig();
     }
 
     @Override
@@ -92,19 +95,19 @@ public class UKTeleOp extends OpMode {
 
 
         if (currentGamepad1.triangle && !previousGamepad1.triangle) {
-            CommandScheduler.getInstance().schedule(new HighGoal(rotation, rotationLimitSwitch, extension, claw));
+            CommandScheduler.getInstance().schedule(new HighGoal(rotation, rotationBottomLimitSwitch, extension, claw));
         }
 
         if (currentGamepad1.square && !previousGamepad1.square) {
-            CommandScheduler.getInstance().schedule(new LowGoal(rotation, rotationLimitSwitch, claw));
+            CommandScheduler.getInstance().schedule(new LowGoal(rotation, rotationBottomLimitSwitch, claw));
         }
 
         if (currentGamepad1.circle && !previousGamepad1.circle) {
-            CommandScheduler.getInstance().schedule(new MediumGoal(rotation, rotationLimitSwitch, claw));
+            CommandScheduler.getInstance().schedule(new MediumGoal(rotation, rotationBottomLimitSwitch, claw));
         }
 
         if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down) {
-            CommandScheduler.getInstance().schedule(new Substation(rotation, extension, extensionLimitSwitch, rotationLimitSwitch, claw));
+            CommandScheduler.getInstance().schedule(new Substation(rotation, extension, extensionLimitSwitch, rotationBottomLimitSwitch, claw));
         }
 
 
@@ -117,7 +120,11 @@ public class UKTeleOp extends OpMode {
                 if (claw.getCurrentState() == Claw.State.OPEN) {
                     claw.close();
                 } else if (claw.getCurrentState() == Claw.State.CLOSED) {
-                    claw.open();
+                    if (rotation.getAngle() > CLAW_CHANGE_STATE_ANGLE) {
+                        claw.openSmall();
+                    } else {
+                        claw.openBig();
+                    }
                 }
                 //clawToggle = !clawToggle;
             }
@@ -135,7 +142,14 @@ public class UKTeleOp extends OpMode {
 
         if (CommandScheduler.getInstance().requiring(rotation) == null) {
             if (gamepad2.right_trigger - gamepad2.left_trigger != 0) {
-                rotation.manualRotation(gamepad2.right_trigger - gamepad2.left_trigger);
+                if (rotationTopLimitSwitch.isPressed()) {
+                    rotation.manualRotation(-gamepad2.left_trigger);
+                } else if (rotationBottomLimitSwitch.isPressed()) {
+                    rotation.manualRotation(gamepad2.right_trigger);
+                } else {
+                    rotation.manualRotation(gamepad2.right_trigger - gamepad2.left_trigger);
+                }
+
             } else {
                 rotation.stop();
             }
@@ -151,8 +165,14 @@ public class UKTeleOp extends OpMode {
             }
         }
 
-        if (rotationLimitSwitch.isPressed()) {
+        if (rotationBottomLimitSwitch.isPressed()) {
             rotation.reset();
+        }
+
+        if (rotation.getAngle() < CLAW_CHANGE_STATE_ANGLE && claw.getCurrentState() == Claw.State.OPEN) {
+            claw.openBig();
+        } else if (rotation.getAngle() > CLAW_CHANGE_STATE_ANGLE && claw.getCurrentState() == Claw.State.OPEN) {
+            claw.openSmall();
         }
 
         telemetry.addData("Loop Time", loopTime.milliseconds());

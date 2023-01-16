@@ -13,7 +13,7 @@ public class OpenClaw extends CommandBase {
 
     @Override
     public void initialize() {
-        claw.open();
+        claw.openBig();
     }
 
     @Override

@@ -27,21 +27,9 @@ public class MeepMeepTesting {
                 // Creates a trajectory
                 .followTrajectorySequence(driveShim ->
                         driveShim.trajectorySequenceBuilder(new Pose2d(-36.0, 64, Math.toRadians(270)))
-                                .splineTo(new Vector2d(-30, 37), Math.toRadians(-54))
-                                .forward(4)
-                                .setReversed(true)
-                                .splineTo(new Vector2d(-35, 50), Math.toRadians(90))
-                                .lineTo(new Vector2d(-35, 4))
-                                .lineTo(new Vector2d(-35, 14))
-                                .turn(Math.toRadians(-92))
-                                .lineTo(new Vector2d(-57, 12))
-                                .setReversed(true)
-                                .lineToLinearHeading(new Pose2d(-40, 14, Math.toRadians(40)))
-                                .lineTo(new Vector2d(-38, 17))
-                                .forward(8)
-                                .lineToLinearHeading(new Pose2d(-38, 14, -3))
-                                .lineTo(new Vector2d(-11.5, 14))
-                                .strafeRight(5)
+                                .lineTo(new Vector2d(-36, 14))
+                                .strafeTo(new Vector2d(-8, 15))
+                                .back(5)
 
                                 .build()
                 );

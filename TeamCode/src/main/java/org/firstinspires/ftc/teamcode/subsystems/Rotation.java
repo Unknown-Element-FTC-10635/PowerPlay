@@ -8,7 +8,10 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.CurrentOpmode;
 
 public class Rotation extends SubsystemBase {
-    private static final int MAX_ANGLE = 140;
+    private static final int MAX_ANGLE = 260;
+    private static final double MULTIPLIER = 5;
+    private static final double MINIMUM_SPEED = 1.1;
+
     private final Telemetry telemetry;
     private final Motor rotation;
     private double currentAngle = 0;
@@ -48,14 +51,13 @@ public class Rotation extends SubsystemBase {
     public void manualRotation(double power) {
         rotation.setRunMode(Motor.RunMode.RawPower);
 
-        power = power * 0.75;
-
-        if (currentAngle <= MAX_ANGLE && power > 0) {
+        if (power > 0 && currentAngle > MAX_ANGLE / 2.0) {
             rotation.set(power * calculateMulitpler(power));
-        } else if (power < 0) {
+        } else if (power < 0 && currentAngle < MAX_ANGLE / 2.0) {
+            rotation.set(power * calculateMulitpler(power));
+        } else {
             rotation.set(power);
         }
-
 
         isMoving = (power != 0);
         telemetry.addData("Rotation Power", power);
@@ -90,8 +92,10 @@ public class Rotation extends SubsystemBase {
     }
 
     private double calculateMulitpler(double power) {
-        // https://www.desmos.com/calculator/rfftz7qk4q
-        return 1 / (1 + Math.pow(Math.E, -((1.0 / 4.5) * (MAX_ANGLE - Math.abs(currentAngle)) - 3)));
+        // https://www.desmos.com/calculator/xegbrro6fw
+        double lower = Math.pow(Math.E, -((1.0 / MULTIPLIER) * (Math.abs(currentAngle)) - MINIMUM_SPEED));
+        double upper = Math.pow(Math.E, -((1.0 / MULTIPLIER) * (MAX_ANGLE - Math.abs(currentAngle)) - MINIMUM_SPEED));
+        return 1 / (1 + lower + upper);
     }
 
     private void detectIfStuck() {
