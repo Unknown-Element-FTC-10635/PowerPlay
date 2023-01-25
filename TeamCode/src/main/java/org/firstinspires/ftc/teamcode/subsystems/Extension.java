@@ -18,8 +18,13 @@ public class Extension extends SubsystemBase {
     private final Motor leftExtension, rightExtension;
     private final ColorSensor tapeMeasure;
 
-    private double distance;
-    private PIDFController pidfController = new PIDFController(0, 0, 0, 0);
+    private double currentPos;
+
+    private static final double P = 0, I = 0, D = 0
+    private static final double F = 0;
+    private static final double TICKS_PER_DEGREE = 537.7 / 360;
+
+    private PIDFController pidfController;
 
     private TapeMeasureColor currentLevel, targetLevel = TapeMeasureColor.UNKNOWN;
     private RGB currentColor;
@@ -64,18 +69,18 @@ public class Extension extends SubsystemBase {
 
     @Override
     public void periodic() {
-        distance = (leftExtension.getDistance() + leftExtension.getDistance()) / 2;
+        currentPos = (leftExtension.getDistance() + leftExtension.getDistance()) / 2;
 
         currentColor = new RGB(tapeMeasure.red(), tapeMeasure.green(), tapeMeasure.blue());
         currentLevel = getCurrentLevel();
 
         if (CurrentOpmode.getCurrentOpmode() == CurrentOpmode.OpMode.AUTO) {
             if (!atTargetLevel() && targetLevel != TapeMeasureColor.UNKNOWN) {
-                rotateLevel(targetLevel, Math.abs(pidfController.calculate(distance)));
+                rotateLevel(targetLevel, Math.abs(pidfController.calculate(currentPos)));
             }
         }
 
-        telemetry.addData("Rotation Distance:", distance);
+        telemetry.addData("Rotation Distance:", currentPos);
         telemetry.addData("Current Color", currentLevel);
         telemetry.addData("Target Color", targetLevel);
         telemetry.addData("At Target Color", atTargetLevel());
@@ -111,7 +116,7 @@ public class Extension extends SubsystemBase {
         return targetLevel == currentLevel;
     }
 
-    public double getDistance() {
-        return distance;
+    public double getCurrentPos() {
+        return currentPos;
     }
 }
