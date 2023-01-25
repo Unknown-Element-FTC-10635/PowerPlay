@@ -3,21 +3,22 @@ package org.firstinspires.ftc.teamcode.commands;
 import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.subsystems.Extension;
+import org.firstinspires.ftc.teamcode.util.color.TapeMeasureColor;
 
 public class Extend extends CommandBase {
     private final Extension extension;
-    private final double inches;
+    private final TapeMeasureColor color;
     private final double speed;
 
-    public Extend(Extension extension, double inches, double speed) {
+    public Extend(Extension extension, TapeMeasureColor color, double speed) {
         this.extension = extension;
-        this.inches = inches;
+        this.color = color;
         this.speed = speed;
     }
 
     @Override
     public void initialize() {
-        extension.rotateInches(inches, speed);
+        extension.rotateLevel(color, speed);
     }
 
     @Override
@@ -27,6 +28,6 @@ public class Extend extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return extension.atTargetExtension();
+        return extension.atTargetLevel();
     }
 }

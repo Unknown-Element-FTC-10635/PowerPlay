@@ -13,11 +13,17 @@ public class Claw extends SubsystemBase {
         UNKNOWN
     }
 
+    public enum Open {
+        BIG,
+        SMALL
+    }
+
     private final Telemetry telemetry;
 
     private final Servo servo;
 
     private State currentState;
+    private Open currentOpenness;
 
     public Claw(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -27,17 +33,26 @@ public class Claw extends SubsystemBase {
         currentState = State.UNKNOWN;
     }
 
+    @Override
+    public void periodic() {
+        telemetry.addData("Claw", currentState);
+
+        telemetry.addData("Claw", servo.getPosition());
+    }
+
     // https://www.desmos.com/calculator/p1p6mngfet
     public void openBig() {
         servo.setPosition(0.35);
 
         currentState = State.OPEN;
+        currentOpenness = Open.BIG;
     }
 
     public void openSmall() {
         servo.setPosition(0.43);
 
         currentState = State.OPEN;
+        currentOpenness = Open.SMALL;
     }
 
     public void close() {
@@ -50,10 +65,7 @@ public class Claw extends SubsystemBase {
         return currentState;
     }
 
-    @Override
-    public void periodic() {
-        telemetry.addData("Claw", currentState);
-
-        telemetry.addData("Claw", servo.getPosition());
+    public Open getCurrentOpenness() {
+        return currentOpenness;
     }
 }

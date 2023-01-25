@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.util.CurrentOpmode;
 
 @TeleOp
 public class UKTeleOp extends OpMode {
-    private static final double CLAW_CHANGE_STATE_ANGLE = 140;
+    private static final double CLAW_CHANGE_STATE_ANGLE = 135;
 
     private DcMotor frontLeft, frontRight, backLeft, backRight;
 
@@ -126,7 +126,6 @@ public class UKTeleOp extends OpMode {
                         claw.openBig();
                     }
                 }
-                //clawToggle = !clawToggle;
             }
         }
 
@@ -169,9 +168,9 @@ public class UKTeleOp extends OpMode {
             rotation.reset();
         }
 
-        if (rotation.getAngle() < CLAW_CHANGE_STATE_ANGLE && claw.getCurrentState() == Claw.State.OPEN) {
+        if (rotation.getAngle() < CLAW_CHANGE_STATE_ANGLE && claw.getCurrentOpenness() == Claw.Open.SMALL && claw.getCurrentState() == Claw.State.OPEN) {
             claw.openBig();
-        } else if (rotation.getAngle() > CLAW_CHANGE_STATE_ANGLE && claw.getCurrentState() == Claw.State.OPEN) {
+        } else if (rotation.getAngle() > CLAW_CHANGE_STATE_ANGLE && claw.getCurrentOpenness() == Claw.Open.BIG && claw.getCurrentState() == Claw.State.OPEN) {
             claw.openSmall();
         }
 

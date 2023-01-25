@@ -12,7 +12,7 @@ public class WebcamTesting extends OpMode {
     @Override
     public void init() {
         webcam = new BaseWebcam(hardwareMap);
-        webcam.startStackDetection();
+        webcam.startStackDetectionBlue();
     }
 
     @Override

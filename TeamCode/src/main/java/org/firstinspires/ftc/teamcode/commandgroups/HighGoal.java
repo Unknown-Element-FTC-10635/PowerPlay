@@ -9,13 +9,14 @@ import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Extension;
 import org.firstinspires.ftc.teamcode.subsystems.LimitSwitch;
 import org.firstinspires.ftc.teamcode.subsystems.Rotation;
+import org.firstinspires.ftc.teamcode.util.color.TapeMeasureColor;
 
 public class HighGoal extends ParallelCommandGroup {
     public HighGoal(Rotation rotation, LimitSwitch bottomSwitch, LimitSwitch topSwitch, Extension extension, Claw claw) {
         addCommands(
                 new CloseClaw(claw),
                 new Rotate(rotation, bottomSwitch, topSwitch,100, 0.35),
-                new Extend(extension,15, 1)
+                new Extend(extension, TapeMeasureColor.ORANGE, 0.75)
         );
     }
 }
