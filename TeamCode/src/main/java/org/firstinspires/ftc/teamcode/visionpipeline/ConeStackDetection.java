@@ -11,21 +11,27 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 public class ConeStackDetection extends OpenCvPipeline {
-    private final Scalar LOWER_BLUE = new Scalar(100, 70, 80);
-    private final Scalar UPPER_BLUE = new Scalar(130, 255, 255);
+    private static final Scalar LOWER_BLUE = new Scalar(100, 70, 80);
+    private static final Scalar UPPER_BLUE = new Scalar(130, 255, 255);
 
-    private final Rect BUFFERED_CENTER = new Rect(230, 0, 80, 480);
+    private static final Scalar LOWER_RED = new Scalar(100, 70, 80);
+    private static final Scalar UPPER_RED = new Scalar(130, 255, 255);
+
+    private static final Rect BUFFERED_CENTER = new Rect(230, 0, 80, 480);
 
     private Mat proc = new Mat();
-    private Mat blue = new Mat();
+    private Mat maskedColor = new Mat();
 
     private StackDirections direction = StackDirections.UNKNOWN;
     private StackEstimate estimate = StackEstimate.EMPTY;
+
+    private double distance;
+
+    private boolean processBlue = true;
 
     public enum StackDirections {
         LEFT,
@@ -45,12 +51,16 @@ public class ConeStackDetection extends OpenCvPipeline {
         Imgproc.cvtColor(mat, proc, Imgproc.COLOR_RGB2HSV);
         Imgproc.GaussianBlur(proc, proc, new Size(5, 5), 0);
 
-        Core.inRange(proc, LOWER_BLUE, UPPER_BLUE, blue);
+        if (processBlue) {
+            Core.inRange(proc, LOWER_BLUE, UPPER_BLUE, maskedColor);
+        } else {
+            Core.inRange(proc, LOWER_RED, UPPER_RED, maskedColor);
+        }
 
         // 5% of a 640x480 image
-        if (Core.countNonZero(blue) > 15360) {
+        if (Core.countNonZero(maskedColor) > 15360) {
             // 15% of a 640x480 image
-            if (Core.countNonZero(blue) > 46080) {
+            if (Core.countNonZero(maskedColor) > 46080) {
                 estimate = StackEstimate.FILLED;
             } else {
                 estimate = StackEstimate.NORMAL;
@@ -58,7 +68,7 @@ public class ConeStackDetection extends OpenCvPipeline {
 
             List<MatOfPoint> contours = new ArrayList<>();
             Mat hierarchy = new Mat();
-            Imgproc.findContours(blue, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+            Imgproc.findContours(maskedColor, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
             contours.sort(new Comparator<MatOfPoint>() {
                 @Override
@@ -75,13 +85,18 @@ public class ConeStackDetection extends OpenCvPipeline {
 
                 if (BUFFERED_CENTER.contains(new Point(centerX, 240))) {
                     direction = StackDirections.CENTER;
-                } else if (centerX < BUFFERED_CENTER.x) {
-                    direction = StackDirections.RIGHT;
-                } else if (centerX > BUFFERED_CENTER.x + BUFFERED_CENTER.width) {
-                    direction = StackDirections.LEFT;
+                    distance = 0;
+                } else {
+                    distance = Math.sqrt(Math.pow(BUFFERED_CENTER.x - centerX, 2));
+                    if (centerX < BUFFERED_CENTER.x) {
+                        direction = StackDirections.RIGHT;
+                    } else if (centerX > BUFFERED_CENTER.x + BUFFERED_CENTER.width) {
+                        direction = StackDirections.LEFT;
+                    }
                 }
 
                 Imgproc.line(mat, new Point(centerX, 0), new Point(centerX, 480), new Scalar(0, 0, 0), 3);
+                Imgproc.line(mat, new Point(BUFFERED_CENTER.x / 2.0, 240), new Point(centerX, 240), new Scalar(0, 0, 0), 3);
                 Imgproc.rectangle(mat, coneRect, new Scalar(0, 0, 255), 3);
             }
         } else {
@@ -100,5 +115,13 @@ public class ConeStackDetection extends OpenCvPipeline {
 
     public StackEstimate getFrameEstimate() {
         return estimate;
+    }
+
+    public void setProcessBlue(boolean processBlue) {
+        this.processBlue = processBlue;
+    }
+
+    public double getDistance() {
+        return distance;
     }
 }

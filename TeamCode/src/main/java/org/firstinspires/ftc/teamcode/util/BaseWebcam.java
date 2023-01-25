@@ -37,8 +37,15 @@ public class BaseWebcam {
         return sleeveDetection.getSleeveColor();
     }
 
-    public void startStackDetection() {
+    public void startStackDetectionBlue() {
         coneStackDetection = new ConeStackDetection();
+        coneStackDetection.setProcessBlue(true);
+        start(coneStackDetection);
+    }
+
+    public void startStackDetectionRed() {
+        coneStackDetection = new ConeStackDetection();
+        coneStackDetection.setProcessBlue(false);
         start(coneStackDetection);
     }
 
@@ -48,6 +55,10 @@ public class BaseWebcam {
 
     public ConeStackDetection.StackEstimate getFrameEstimate() {
         return coneStackDetection.getFrameEstimate();
+    }
+
+    public double getStackDistance() {
+        return coneStackDetection.getDistance();
     }
 
     private void start(OpenCvPipeline pipeline) {
