@@ -133,7 +133,7 @@ public class LeftMedium extends CommandOpMode {
                         new WaitCommand(500),
                         new ParallelCommandGroup(
                                 new FollowTrajectoryCommand(drive, preloadDelivery),
-                                new MediumGoal(rotation, rotationBottomSwitch, rotationTopSwitch, claw)
+                                new MediumGoal(rotation, extension, rotationBottomSwitch, rotationTopSwitch, claw)
                         ),
                         new WaitCommand(300),
                         new OpenClaw(claw),

@@ -16,7 +16,7 @@ public class HighGoal extends ParallelCommandGroup {
         addCommands(
                 new CloseClaw(claw),
                 new Rotate(rotation, bottomSwitch, topSwitch,100, 0.35),
-                new Extend(extension, TapeMeasureColor.ORANGE, 0.75)
+                new Extend(extension, Extension.TargetLevel.HIGH)
         );
     }
 }

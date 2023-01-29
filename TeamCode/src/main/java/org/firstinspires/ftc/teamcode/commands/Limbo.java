@@ -17,16 +17,18 @@ public class Limbo extends CommandBase {
 
     @Override
     public void initialize() {
-        extension.rotatePower(-0.5f);
+        extension.setTargetLevel(Extension.TargetLevel.SUBSTATION);
     }
 
     @Override
     public void end(boolean interrupted) {
-        extension.stop();
+        if (limitSwitch.isPressed()) {
+            extension.reset();
+        }
     }
 
     @Override
     public boolean isFinished() {
-        return limitSwitch.isPressed();
+        return limitSwitch.isPressed() || extension.atTargetLevel();
     }
 }

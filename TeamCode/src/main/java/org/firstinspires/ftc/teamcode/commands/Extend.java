@@ -5,30 +5,32 @@ import com.arcrobotics.ftclib.command.CommandBase;
 import org.firstinspires.ftc.teamcode.subsystems.Extension;
 import org.firstinspires.ftc.teamcode.util.color.TapeMeasureColor;
 
-public class Extend extends CommandBase {
-    private final Extension extension;
-    private final TapeMeasureColor color;
-    private final double speed;
+import java.lang.annotation.Target;
+import java.util.logging.Logger;
 
-    public Extend(Extension extension, TapeMeasureColor color, double speed) {
+public class Extend extends CommandBase {
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
+
+    private final Extension extension;
+    private final Extension.TargetLevel level;
+
+    public Extend(Extension extension, Extension.TargetLevel level) {
         this.extension = extension;
-        this.color = color;
-        this.speed = speed;
+        this.level = level;
+
     }
 
     @Override
     public void initialize() {
-        extension.rotateLevel(color, speed);
-    }
+        extension.setTargetLevel(level);
 
-    @Override
-    public void end(boolean interrupted) {
-        extension.stop();
-        extension.reset();
+        logger.info("Initializing Extension " + level);
     }
 
     @Override
     public boolean isFinished() {
+        logger.info("Finished Extension from Position");
         return extension.atTargetLevel();
+
     }
 }

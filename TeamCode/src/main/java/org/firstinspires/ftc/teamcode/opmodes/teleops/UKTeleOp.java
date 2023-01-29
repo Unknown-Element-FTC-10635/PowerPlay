@@ -104,7 +104,7 @@ public class UKTeleOp extends OpMode {
         }
 
         if (currentGamepad1.circle && !previousGamepad1.circle) {
-            CommandScheduler.getInstance().schedule(new MediumGoal(rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, claw));
+            CommandScheduler.getInstance().schedule(new MediumGoal(rotation, extension, rotationBottomLimitSwitch, rotationTopLimitSwitch, claw));
         }
 
         if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down) {

@@ -17,10 +17,11 @@ public class Extension extends SubsystemBase {
         SUBSTATION(0, 0),
         LOW(100, 1),
         MEDIUM(400, 2),
-        HIGH(1000, 3);
+        HIGH(1000, 3),
+        EXTRA_TALL(1250, 4);
 
-        private int height;
-        private int order;
+        private final int height;
+        private final int order;
 
         TargetLevel(int height, int order) {
             this.height = height;
@@ -70,14 +71,14 @@ public class Extension extends SubsystemBase {
     public void upLevel() {
         switch (targetLevel) {
             case SUBSTATION:
-                targetLevel = TargetLevel.LOW;
-                break;
             case LOW:
                 targetLevel = TargetLevel.MEDIUM;
                 break;
             case MEDIUM:
                 targetLevel = TargetLevel.HIGH;
                 break;
+            case HIGH:
+                targetLevel = TargetLevel.EXTRA_TALL;
             default:
                 break;
         }
@@ -86,16 +87,31 @@ public class Extension extends SubsystemBase {
     public void downLevel() {
         switch (targetLevel) {
             case LOW:
-                targetLevel = TargetLevel.SUBSTATION;
-                break;
             case MEDIUM:
-                targetLevel = TargetLevel.LOW;
+                targetLevel = TargetLevel.SUBSTATION;
                 break;
             case HIGH:
                 targetLevel = TargetLevel.MEDIUM;
                 break;
+            case EXTRA_TALL:
+                targetLevel = TargetLevel.HIGH;
             default:
                 break;
+        }
+    }
+
+    public void setTargetLevel(TargetLevel targetLevel) {
+        this.targetLevel = targetLevel;
+    }
+
+    public boolean atTargetLevel() {
+        double average = (leftExtension.getCurrentPosition() + rightExtension.getCurrentPosition()) / 2.0;
+        if (average < targetLevel.getHeight() * 1.01) {
+            return true;
+        } else if (average > targetLevel.getHeight() * 0.99) {
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -109,6 +125,9 @@ public class Extension extends SubsystemBase {
         }
 
         telemetry.addData("Extension Target", targetLevel);
+        telemetry.addData("Extension Target Encoder", targetLevel.getHeight());
+        telemetry.addData("Left Extension", leftExtension.getCurrentPosition());
+        telemetry.addData("Right Extension", rightExtension.getCurrentPosition());
     }
 
 
