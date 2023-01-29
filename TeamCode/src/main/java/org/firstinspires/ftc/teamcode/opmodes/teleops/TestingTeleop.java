@@ -1,48 +1,69 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleops;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @Config
 @TeleOp
 public class TestingTeleop extends OpMode {
-    private PIDController pidController;
+    private PIDController pidController1, pidController2;
     private DcMotorEx leftExtension, rightExtension;
 
+    public static double pL = 0.00175, iL = 0, dL = 0.00001;
+    public static double fL = 0.001;
 
-    public static double p = 0, i = 0, d = 0;
-    public static double f = 0;
+    public static double pR = 0.006, iR = 0, dR = 0.0001;
+    public static double fR = 0.0125;
 
     public static int target = 0;
 
     private static final double TICKS_PER_DEGREE = 537.7 / 360;
 
-    @java.lang.Override
+    @Override
     public void init() {
-        pidController = new PIDController(p, i, d);
+        pidController1 = new PIDController(pL, iL, dL);
+        pidController2 = new PIDController(pR, iR, dR);
+
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         leftExtension = hardwareMap.get(DcMotorEx.class, "leftExtension");
+        leftExtension.setDirection(DcMotorSimple.Direction.REVERSE);
         rightExtension = hardwareMap.get(DcMotorEx.class, "rightExtension");
+
+        leftExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        rightExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     @java.lang.Override
     public void loop() {
-        pidController.setPID(p, i, d);
-        int armPos = (leftExtension.getCurrentPosition() + rightExtension.getCurrentPosition()) / 2;
-        double pid = pidController.calculate(armPos, target);
-        double ff = Math.cos(Math.toRadians(target / TICKS_PER_DEGREE)) * f;
+        pidController1.setPID(pL, iL, dL);
+        int armPos1 = leftExtension.getCurrentPosition();
+        double pid1 = pidController1.calculate(armPos1, target);
+        double ff1 = Math.cos(Math.toRadians(target / TICKS_PER_DEGREE)) * fL;
 
-        double power = pid + f;
+        double power1 = pid1 + ff1;
+        leftExtension.setPower(power1);
 
-        leftExtension.setPower(power);
-        rightExtension.setPower(power);
+        pidController2.setPID(pR, iR, dR);
+        int armPos2 = rightExtension.getCurrentPosition();
+        double pid2 = pidController2.calculate(armPos2, target);
+        double ff2 = Math.cos(Math.toRadians(target / TICKS_PER_DEGREE)) * fR;
 
-        telemetry.addData("Position", armPos);
+        double power2 = pid2 + ff2;
+        rightExtension.setPower(power2);
+
+        telemetry.addData("Position Left", armPos1);
+        telemetry.addData("Position Right", armPos2);
         telemetry.addData("Target", target);
         telemetry.update();
     }
