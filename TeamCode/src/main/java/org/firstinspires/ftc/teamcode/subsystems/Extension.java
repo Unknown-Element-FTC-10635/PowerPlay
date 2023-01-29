@@ -1,122 +1,141 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.arcrobotics.ftclib.controller.PIDFController;
-import com.arcrobotics.ftclib.hardware.motors.Motor;
-import com.qualcomm.hardware.rev.RevColorSensorV3;
-import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.arcrobotics.ftclib.controller.PIDController;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.CurrentOpmode;
-import org.firstinspires.ftc.teamcode.util.color.RGB;
-import org.firstinspires.ftc.teamcode.util.color.TapeMeasureColor;
 
+@Config
 public class Extension extends SubsystemBase {
+    public enum TargetLevel {
+        SUBSTATION(0, 0),
+        LOW(100, 1),
+        MEDIUM(400, 2),
+        HIGH(1000, 3);
+
+        private int height;
+        private int order;
+
+        TargetLevel(int height, int order) {
+            this.height = height;
+            this.order = order;
+        }
+
+        public int getHeight() {
+            return height;
+        }
+
+        public int getOrder() {
+            return order;
+        }
+    }
+
     private final Telemetry telemetry;
 
-    private final Motor leftExtension, rightExtension;
-    private final ColorSensor tapeMeasure;
+    private final DcMotorEx leftExtension, rightExtension;
 
-    private double currentPos;
+    private TargetLevel targetLevel = TargetLevel.SUBSTATION;
 
-    private static final double P = 0, I = 0, D = 0
-    private static final double F = 0;
+    // PID
+    private final PIDController leftPIDController;
+    private final PIDController rightPIDController;
+
+    public static double pL = 0.00175, iL = 0, dL = 0.00001;
+    public static double fL = 0.001;
+
+    public static double pR = 0.006, iR = 0, dR = 0.0001;
+    public static double fR = 0.0125;
+
     private static final double TICKS_PER_DEGREE = 537.7 / 360;
-
-    private PIDFController pidfController;
-
-    private TapeMeasureColor currentLevel, targetLevel = TapeMeasureColor.UNKNOWN;
-    private RGB currentColor;
 
     public Extension(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
-        leftExtension = new Motor(hardwareMap, "leftExtension"); //hardwareMap.get(Motor.class, "leftExtension");
-        rightExtension = new Motor(hardwareMap, "rightExtension"); //hardwareMap.get(Motor.class, "rightExtension");
-        rightExtension.setInverted(true);
+        leftExtension = hardwareMap.get(DcMotorEx.class, "leftExtension"); //new Motor(hardwareMap, "leftExtension");
+        leftExtension.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightExtension = hardwareMap.get(DcMotorEx.class, "rightExtension"); //new Motor(hardwareMap, "rightExtension");
 
-        leftExtension.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        rightExtension.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        reset();
 
-        tapeMeasure = hardwareMap.get(RevColorSensorV3.class, "tapeMeasure");
-
-        pidfController.setSetPoint(0);
+        leftPIDController = new PIDController(pL, iL, dL);
+        rightPIDController = new PIDController(pR, iR, dR);
     }
 
-    public void rotatePower(float power) {
-        leftExtension.setRunMode(Motor.RunMode.RawPower);
-        rightExtension.setRunMode(Motor.RunMode.RawPower);
-
-        leftExtension.set(power);
-        rightExtension.set(power);
+    public void upLevel() {
+        switch (targetLevel) {
+            case SUBSTATION:
+                targetLevel = TargetLevel.LOW;
+                break;
+            case LOW:
+                targetLevel = TargetLevel.MEDIUM;
+                break;
+            case MEDIUM:
+                targetLevel = TargetLevel.HIGH;
+                break;
+            default:
+                break;
+        }
     }
 
-    public void rotateLevel(TapeMeasureColor targetColor, double power) {
-        leftExtension.setRunMode(Motor.RunMode.RawPower);
-        rightExtension.setRunMode(Motor.RunMode.RawPower);
-
-        targetLevel = targetColor;
-
-        if (targetColor.getOrder() > currentLevel.getOrder()) {
-            leftExtension.set(power);
-            rightExtension.set(power);
-        } else if (targetColor.getOrder() < currentLevel.getOrder()) {
-            leftExtension.set(-power);
-            rightExtension.set(-power);
+    public void downLevel() {
+        switch (targetLevel) {
+            case LOW:
+                targetLevel = TargetLevel.SUBSTATION;
+                break;
+            case MEDIUM:
+                targetLevel = TargetLevel.LOW;
+                break;
+            case HIGH:
+                targetLevel = TargetLevel.MEDIUM;
+                break;
+            default:
+                break;
         }
     }
 
     @Override
     public void periodic() {
-        currentPos = (leftExtension.getDistance() + leftExtension.getDistance()) / 2;
-
-        currentColor = new RGB(tapeMeasure.red(), tapeMeasure.green(), tapeMeasure.blue());
-        currentLevel = getCurrentLevel();
+        if (CurrentOpmode.getCurrentOpmode() == CurrentOpmode.OpMode.TELEOP) {
+            movePID(targetLevel.getHeight());
+        }
 
         if (CurrentOpmode.getCurrentOpmode() == CurrentOpmode.OpMode.AUTO) {
-            if (!atTargetLevel() && targetLevel != TapeMeasureColor.UNKNOWN) {
-                rotateLevel(targetLevel, Math.abs(pidfController.calculate(currentPos)));
-            }
         }
 
-        telemetry.addData("Rotation Distance:", currentPos);
-        telemetry.addData("Current Color", currentLevel);
-        telemetry.addData("Target Color", targetLevel);
-        telemetry.addData("At Target Color", atTargetLevel());
+        telemetry.addData("Extension Target", targetLevel);
     }
 
-    private TapeMeasureColor getCurrentLevel() {
-        double closestDistance = 1000;
-        TapeMeasureColor closetColor = TapeMeasureColor.UNKNOWN;
-        for (TapeMeasureColor tapeColor : TapeMeasureColor.getAllColors()) {
-            double distance = Math.sqrt(Math.pow(tapeColor.getColor().getRed() - currentColor.getRed(), 2) + Math.pow(tapeColor.getColor().getGreen() - currentColor.getGreen(), 2) + Math.pow(tapeColor.getColor().getBlue() - currentColor.getBlue(), 2));
 
-            if (distance < closestDistance) {
-                closestDistance = distance;
-                closetColor = tapeColor;
-            }
-        }
+    private void movePID(double level) {
+        double cos = Math.cos(Math.toRadians(level / TICKS_PER_DEGREE));
 
-        return closetColor;
+        double pidLeft = leftPIDController.calculate(leftExtension.getCurrentPosition(), level);
+        double ffLeft = cos * fL;
+
+        leftExtension.setPower(pidLeft + ffLeft);
+
+        double pidRight = rightPIDController.calculate(rightExtension.getCurrentPosition(), level);
+        double ffRight = cos * fR;
+
+        rightExtension.setPower(pidRight + ffRight);
     }
 
     public void stop() {
-        leftExtension.stopMotor();
-        rightExtension.stopMotor();
+        leftExtension.setPower(0);
+        rightExtension.setPower(0);
     }
 
     public void reset() {
-        leftExtension.resetEncoder();
-        rightExtension.resetEncoder();
-    }
+        leftExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-    public boolean atTargetLevel() {
-        reset();
-        return targetLevel == currentLevel;
-    }
-
-    public double getCurrentPos() {
-        return currentPos;
+        leftExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 }

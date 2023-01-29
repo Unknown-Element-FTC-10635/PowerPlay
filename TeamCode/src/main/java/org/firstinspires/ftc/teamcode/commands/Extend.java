@@ -24,6 +24,7 @@ public class Extend extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         extension.stop();
+        extension.reset();
     }
 
     @Override

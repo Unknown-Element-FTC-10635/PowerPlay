@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Extension;
 import org.firstinspires.ftc.teamcode.subsystems.LimitSwitch;
 import org.firstinspires.ftc.teamcode.subsystems.Rotation;
 import org.firstinspires.ftc.teamcode.util.CurrentOpmode;
+import org.firstinspires.ftc.teamcode.util.SubsystemState;
 
 @TeleOp
 public class UKTeleOp extends OpMode {
@@ -54,7 +55,7 @@ public class UKTeleOp extends OpMode {
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Subsystems
-        extensionLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "primarySwitch");
+        extensionLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "extensionSW");
         rotationBottomLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "rotationBSW");
         rotationTopLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "rotationTSW");
         extension = new Extension(hardwareMap, telemetry);
@@ -130,7 +131,7 @@ public class UKTeleOp extends OpMode {
         }
 
         // Primary
-        if (currentGamepad1.right_stick_button && previousGamepad1.right_stick_button) {
+        if (currentGamepad1.right_stick_button && !previousGamepad1.right_stick_button) {
             speedToggle = !speedToggle;
             if (speedToggle) {
                 wheelMultiplier = 1;
@@ -155,17 +156,19 @@ public class UKTeleOp extends OpMode {
         }
 
         if (CommandScheduler.getInstance().requiring(extension) == null) {
-            if (gamepad2.right_bumper) {
-                extension.rotatePower(-1f);
-            } else if (gamepad2.left_bumper) {
-                extension.rotatePower(0.5f);
-            } else {
-                extension.stop();
+            if (currentGamepad2.right_bumper && !previousGamepad2.right_bumper) {
+                extension.upLevel();
+            } else if (currentGamepad2.left_bumper && !previousGamepad2.left_bumper) {
+                extension.downLevel();
             }
         }
 
         if (rotationBottomLimitSwitch.isPressed()) {
             rotation.reset();
+        }
+
+        if (extensionLimitSwitch.isPressed()) {
+            extension.reset();
         }
 
         if (rotation.getAngle() < CLAW_CHANGE_STATE_ANGLE && claw.getCurrentOpenness() == Claw.Open.SMALL && claw.getCurrentState() == Claw.State.OPEN) {
