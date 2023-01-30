@@ -19,6 +19,21 @@ public class TestingTeleop extends LinearOpMode {
 
         waitForStart();
 
+        frontLeft.setPower(0.5);
+        Thread.sleep(500);
+        frontLeft.setPower(0);
+        backLeft.setPower(0.5);
+        Thread.sleep(500);
+        backLeft.setPower(0);
+        frontRight.setPower(0.5);
+        Thread.sleep(500);
+        frontRight.setPower(0);
+        backRight.setPower(0.5);
+        Thread.sleep(500);
+        backRight.setPower(0);
+
+        Thread.sleep(1000);
+
         frontLeft.setPower(0.25);
         Thread.sleep(500);
         frontLeft.setPower(0);
@@ -29,6 +44,21 @@ public class TestingTeleop extends LinearOpMode {
         Thread.sleep(500);
         frontRight.setPower(0);
         backRight.setPower(0.25);
+        Thread.sleep(500);
+        backRight.setPower(0);
+
+        Thread.sleep(1000);
+
+        frontLeft.setPower(0.1);
+        Thread.sleep(500);
+        frontLeft.setPower(0);
+        backLeft.setPower(0.1);
+        Thread.sleep(500);
+        backLeft.setPower(0);
+        frontRight.setPower(0.1);
+        Thread.sleep(500);
+        frontRight.setPower(0);
+        backRight.setPower(0.1);
         Thread.sleep(500);
         backRight.setPower(0);
     }
