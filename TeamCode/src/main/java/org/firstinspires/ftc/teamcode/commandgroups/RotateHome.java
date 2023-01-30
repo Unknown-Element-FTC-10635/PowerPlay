@@ -18,7 +18,7 @@ public class RotateHome extends SequentialCommandGroup {
         addCommands(
                 //new Rotate(rotation, bottomSwitch, 10, 0.005),
                 //new WaitCommand(200),
-                new Rotate(rotation, bottomSwitch, topSwitch, 1, 0.005)
+                new Rotate(rotation, bottomSwitch, topSwitch, 1, 0.01)
         );
     }
 }

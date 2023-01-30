@@ -38,7 +38,7 @@ public class TestAuto extends CommandOpMode {
         schedule(
                 new SequentialCommandGroup(
                         new WaitCommand(500),
-                        new HighGoal(rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, extension, claw)
+                        new HighGoal(rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, extension,  extensionLimitSwitch, claw)
                         //new MediumGoal(rotation, rotationSW, claw),
                         //new WaitCommand(2000),
                         //new RotateHome(rotation, rotationSW)

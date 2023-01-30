@@ -127,46 +127,7 @@ public class LeftMedium extends CommandOpMode {
 
         schedule(
                 new SequentialCommandGroup(
-                        new InstantCommand(baseWebcam::stop),
-                        new OpenClaw(claw),
-                        new CloseClaw(claw),
-                        new WaitCommand(500),
-                        new ParallelCommandGroup(
-                                new FollowTrajectoryCommand(drive, preloadDelivery),
-                                new MediumGoal(rotation, extension, rotationBottomSwitch, rotationTopSwitch, claw)
-                        ),
-                        new WaitCommand(300),
-                        new OpenClaw(claw),
-                        new ParallelCommandGroup(
-                                new SequentialCommandGroup(
-                                        new WaitCommand(300),
-                                        new RotateHome(rotation, rotationBottomSwitch, rotationTopSwitch)
-                                ),
-                                new FollowTrajectoryCommand(drive, safePosition)
-                                //new InstantCommand(baseWebcam::switchPipelineConeStack)
-                        ),
-                        new FollowTrajectoryCommand(drive, stackStart),
-                        new OpenClaw(claw),
-                        new Rotate(rotation, rotationBottomSwitch, rotationTopSwitch, 30, 0.1),
-                        new FollowTrajectoryCommand(drive, approachStack),
-                        new ParallelCommandGroup(
-                                new WaitCommand(250),
-                                new CloseClaw(claw)
-                        ),
-                        new ParallelCommandGroup(
-                                new SequentialCommandGroup(
-                                        new WaitCommand(50),
-                                        new Rotate(rotation, rotationBottomSwitch, rotationTopSwitch, 90, 0.2),
-                                        new Rotate(rotation, rotationBottomSwitch, rotationTopSwitch, 125, 0.05)
-                                ),
-                                new FollowTrajectoryCommand(drive, approachPole)
-                        ),
-                        new WaitCommand(500),
-                        new OpenClaw(claw),
-                        new WaitCommand(250),
-                        new FollowTrajectoryCommand(drive, backAwayPole),
-                        new PickPark(drive, sleeveColor, purple, orange, green),
-                        new RotateHome(rotation, rotationBottomSwitch, rotationTopSwitch)
+
                 )
         );
 

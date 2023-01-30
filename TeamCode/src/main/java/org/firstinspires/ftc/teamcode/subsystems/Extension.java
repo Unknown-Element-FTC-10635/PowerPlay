@@ -10,38 +10,16 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.CurrentOpmode;
+import org.firstinspires.ftc.teamcode.util.lift.LiftHeight;
+import org.firstinspires.ftc.teamcode.util.lift.PoleLevel;
 
 @Config
 public class Extension extends SubsystemBase {
-    public enum TargetLevel {
-        SUBSTATION(0, 0),
-        LOW(100, 1),
-        MEDIUM(400, 2),
-        HIGH(1000, 3),
-        EXTRA_TALL(1250, 4);
-
-        private final int height;
-        private final int order;
-
-        TargetLevel(int height, int order) {
-            this.height = height;
-            this.order = order;
-        }
-
-        public int getHeight() {
-            return height;
-        }
-
-        public int getOrder() {
-            return order;
-        }
-    }
-
     private final Telemetry telemetry;
 
     private final DcMotorEx leftExtension, rightExtension;
 
-    private TargetLevel targetLevel = TargetLevel.SUBSTATION;
+    private LiftHeight targetLevel = PoleLevel.SUBSTATION;
 
     // PID
     private final PIDController leftPIDController;
@@ -69,46 +47,46 @@ public class Extension extends SubsystemBase {
     }
 
     public void upLevel() {
-        switch (targetLevel) {
+        targetLevel = PoleLevel.getClosestHeight(targetLevel);
+        switch ((PoleLevel)targetLevel) {
             case SUBSTATION:
             case LOW:
-                targetLevel = TargetLevel.MEDIUM;
+                targetLevel = PoleLevel.MEDIUM;
                 break;
             case MEDIUM:
-                targetLevel = TargetLevel.HIGH;
+                targetLevel = PoleLevel.HIGH;
                 break;
             case HIGH:
-                targetLevel = TargetLevel.EXTRA_TALL;
+                targetLevel = PoleLevel.EXTRA_TALL;
             default:
                 break;
         }
     }
 
     public void downLevel() {
-        switch (targetLevel) {
+        targetLevel = PoleLevel.getClosestHeight(targetLevel);
+        switch ((PoleLevel)targetLevel) {
             case LOW:
             case MEDIUM:
-                targetLevel = TargetLevel.SUBSTATION;
+                targetLevel = PoleLevel.SUBSTATION;
                 break;
             case HIGH:
-                targetLevel = TargetLevel.MEDIUM;
+                targetLevel = PoleLevel.MEDIUM;
                 break;
             case EXTRA_TALL:
-                targetLevel = TargetLevel.HIGH;
+                targetLevel = PoleLevel.HIGH;
             default:
                 break;
         }
     }
 
-    public void setTargetLevel(TargetLevel targetLevel) {
+    public void setTargetLevel(LiftHeight targetLevel) {
         this.targetLevel = targetLevel;
     }
 
     public boolean atTargetLevel() {
         double average = (leftExtension.getCurrentPosition() + rightExtension.getCurrentPosition()) / 2.0;
-        if (average < targetLevel.getHeight() * 1.01) {
-            return true;
-        } else if (average > targetLevel.getHeight() * 0.99) {
+        if (average < targetLevel.getHeight() + 5 && average > targetLevel.getHeight() - 5) {
             return true;
         } else {
             return false;
@@ -122,6 +100,7 @@ public class Extension extends SubsystemBase {
         }
 
         if (CurrentOpmode.getCurrentOpmode() == CurrentOpmode.OpMode.AUTO) {
+            movePID(targetLevel.getHeight());
         }
 
         telemetry.addData("Extension Target", targetLevel);
