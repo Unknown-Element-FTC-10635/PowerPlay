@@ -1,18 +1,5 @@
 package org.firstinspires.ftc.teamcode.roadrunner.drive;
 
-import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MAX_ACCEL;
-import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MAX_ANG_ACCEL;
-import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MAX_ANG_VEL;
-import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MAX_VEL;
-import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MOTOR_VELO_PID;
-import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.RUN_USING_ENCODER;
-import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.TRACK_WIDTH;
-import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.encoderTicksToInches;
-import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kA;
-import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kStatic;
-import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kV;
-
-
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -49,15 +36,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MAX_ACCEL;
+import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MAX_ANG_ACCEL;
+import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MAX_ANG_VEL;
+import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MAX_VEL;
+import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MOTOR_VELO_PID;
+import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.RUN_USING_ENCODER;
+import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.TRACK_WIDTH;
+import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.encoderTicksToInches;
+import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kA;
+import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kStatic;
+import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kV;
+
 /*
  * Simple mecanum drive hardware implementation for REV hardware.
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(6, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(12, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(8, 0, 1);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(8.5, 0, 1);
 
-    public static double LATERAL_MULTIPLIER = 1.6;
+    public static double LATERAL_MULTIPLIER = 1.57894737;
 
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
