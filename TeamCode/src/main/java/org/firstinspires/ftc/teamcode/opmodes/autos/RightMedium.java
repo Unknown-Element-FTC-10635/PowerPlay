@@ -63,13 +63,12 @@ public class RightMedium extends CommandOpMode {
         TrajectorySequence preloadDelivery = drive.trajectorySequenceBuilder(start)
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, 13.375))
                 .splineTo(new Vector2d(-36, 40), Math.toRadians(270))
-                .lineToSplineHeading(new Pose2d(-35, 11, Math.toRadians(135)))
-                .strafeRight(0.6)
-                .back(8)
+                .lineToSplineHeading(new Pose2d(-36.5, 12, Math.toRadians(135)))
+                .back(9)
                 .build();
 
         TrajectorySequence pickUpPosition = drive.trajectorySequenceBuilder(preloadDelivery.end())
-                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, 13.375))
+                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(30, 30, 13.375))
                 .splineTo(new Vector2d(-40, 12), Math.toRadians(180))
                 .lineTo(new Vector2d(-62, 12))
                 .build();
@@ -80,6 +79,24 @@ public class RightMedium extends CommandOpMode {
                 .lineToSplineHeading(new Pose2d(-35, 11, Math.toRadians(135)))
                 .strafeRight(0.6)
                 .back(8)
+                .build();
+
+        TrajectorySequence setUpPark = drive.trajectorySequenceBuilder(approachPole.end())
+                .splineTo(new Vector2d(-40, 12), Math.toRadians(180))
+                .build();
+
+        TrajectorySequence orange = drive.trajectorySequenceBuilder(setUpPark.end())
+                .strafeRight(5)
+                .build();
+
+        TrajectorySequence purple = drive.trajectorySequenceBuilder(setUpPark.end())
+                .lineTo(new Vector2d(-10, 18))
+                .strafeRight(5)
+                .build();
+
+        TrajectorySequence green = drive.trajectorySequenceBuilder(setUpPark.end())
+                .lineTo(new Vector2d(-60, 17))
+                .strafeRight(5)
                 .build();
 
         telemetry.addLine("Starting Webcam");
@@ -107,6 +124,7 @@ public class RightMedium extends CommandOpMode {
         schedule(
                 new SequentialCommandGroup(
                         new InstantCommand(baseWebcam::stop),
+                        new OpenClaw(claw),
                         new CloseClaw(claw),
                         new WaitCommand(300),
                         new ParallelCommandGroup(
@@ -117,7 +135,7 @@ public class RightMedium extends CommandOpMode {
                                 )
                         ),
                         new OpenClaw(claw),
-                        new Substation(rotation, extension, extensionLimitSwitch, rotationBottomSwitch, rotationBottomSwitch, claw),
+                        new Substation(rotation, extension, extensionLimitSwitch, rotationBottomSwitch, rotationTopSwitch, claw),
                         new ParallelCommandGroup(
                                 new Extend(extension, extensionLimitSwitch, ConeStackLevel.FIVE),
                                 new FollowTrajectoryCommand(drive, pickUpPosition)
@@ -129,6 +147,23 @@ public class RightMedium extends CommandOpMode {
                                 new FollowTrajectoryCommand(drive, approachPole)
                         ),
                         new OpenClaw(claw),
+                        new WaitCommand(200),
+                        new Substation(rotation, extension, extensionLimitSwitch, rotationBottomSwitch, rotationTopSwitch, claw),
+                        new ParallelCommandGroup(
+                                new Extend(extension, extensionLimitSwitch, ConeStackLevel.FOUR),
+                                new FollowTrajectoryCommand(drive, pickUpPosition)
+                        ),
+                        new CloseClaw(claw),
+                        new WaitCommand(250),
+                        new ParallelCommandGroup(
+                                new HighGoal(rotation, rotationBottomSwitch, rotationTopSwitch, extension, extensionLimitSwitch, claw),
+                                new FollowTrajectoryCommand(drive, approachPole)
+                        ),
+                        new OpenClaw(claw),
+                        new WaitCommand(200),
+                        new Substation(rotation, extension, extensionLimitSwitch, rotationBottomSwitch, rotationTopSwitch, claw),
+                        new FollowTrajectoryCommand(drive, setUpPark),
+                        new PickPark(drive, sleeveColor, purple, orange, green),
 
                         new InstantCommand(() -> logger.info("Finished Program"))
                 )

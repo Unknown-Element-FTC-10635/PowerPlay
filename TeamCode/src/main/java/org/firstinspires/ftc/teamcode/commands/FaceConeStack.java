@@ -12,14 +12,17 @@ public class FaceConeStack extends CommandBase {
 
     private final double SPEED = 0.15;
 
-    public FaceConeStack(SampleMecanumDrive drive, BaseWebcam webcam) {
+    private boolean forward;
+
+    public FaceConeStack(SampleMecanumDrive drive, BaseWebcam webcam, boolean forward) {
         this.drive = drive;
         this.webcam = webcam;
+        this.forward = forward;
     }
 
     @Override
     public void execute() {
-        if (webcam.getStackDirection() == ConeStackDetection.StackDirections.CENTER) {
+        if (forward && webcam.getStackDirection() == ConeStackDetection.StackDirections.CENTER) {
             drive.setMotorPowers(0.25, 0.25, 0.25, 0.25);
         }else if (webcam.getStackDirection() == ConeStackDetection.StackDirections.LEFT) {
             drive.setMotorPowers(SPEED, SPEED, -SPEED, -SPEED);

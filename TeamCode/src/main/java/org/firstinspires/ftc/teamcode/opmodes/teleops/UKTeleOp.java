@@ -155,11 +155,25 @@ public class UKTeleOp extends OpMode {
             }
         }
 
+        if (currentGamepad2.square && !previousGamepad2.square) {
+            extension.setOverride(true);
+        }
+
         if (CommandScheduler.getInstance().requiring(extension) == null) {
-            if (currentGamepad2.right_bumper && !previousGamepad2.right_bumper) {
-                extension.upLevel();
-            } else if (currentGamepad2.left_bumper && !previousGamepad2.left_bumper) {
-                extension.downLevel();
+            if (extension.isOverride()) {
+                if (gamepad2.right_bumper) {
+                    extension.moveManual(1.0);
+                } else if (gamepad2.left_bumper) {
+                    extension.moveManual(-0.75);
+                } else {
+                    extension.stop();
+                }
+            } else {
+                if (currentGamepad2.right_bumper && !previousGamepad2.right_bumper) {
+                    extension.upLevel();
+                } else if (currentGamepad2.left_bumper && !previousGamepad2.left_bumper) {
+                    extension.downLevel();
+                }
             }
         }
 

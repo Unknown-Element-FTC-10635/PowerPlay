@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode.util.lift;
 
 public enum ConeStackLevel implements LiftHeight {
-    FIVE(600),
-    FOUR(50),
-    THREE(30),
-    TWO(10),
+    FIVE(850),
+    FOUR(675),
+    THREE(300),
+    TWO(200),
     ONE(0);
 
     private final int height;

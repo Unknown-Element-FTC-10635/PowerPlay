@@ -33,6 +33,8 @@ public class Extension extends SubsystemBase {
 
     private static final double TICKS_PER_DEGREE = 537.7 / 360;
 
+    private boolean override = false;
+
     public Extension(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
@@ -80,6 +82,11 @@ public class Extension extends SubsystemBase {
         }
     }
 
+    public void moveManual(double speed) {
+        leftExtension.setPower(speed);
+        rightExtension.setPower(speed);
+    }
+
     public void setTargetLevel(LiftHeight targetLevel) {
         this.targetLevel = targetLevel;
     }
@@ -96,7 +103,9 @@ public class Extension extends SubsystemBase {
     @Override
     public void periodic() {
         if (CurrentOpmode.getCurrentOpmode() == CurrentOpmode.OpMode.TELEOP) {
-            movePID(targetLevel.getHeight());
+            if (!override) {
+                movePID(targetLevel.getHeight());
+            }
         }
 
         if (CurrentOpmode.getCurrentOpmode() == CurrentOpmode.OpMode.AUTO) {
@@ -135,5 +144,21 @@ public class Extension extends SubsystemBase {
 
         leftExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void setOverride(boolean override) {
+        this.override = override;
+        if (override) {
+            leftExtension.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rightExtension.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        } else {
+            leftExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+
+    }
+
+    public boolean isOverride() {
+        return override;
     }
 }

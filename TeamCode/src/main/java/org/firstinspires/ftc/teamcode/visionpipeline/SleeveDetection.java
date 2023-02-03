@@ -20,7 +20,7 @@ public class SleeveDetection extends OpenCvPipeline {
     private final Scalar LOWER_PURPLE = new Scalar(130, 20, 40);
     private final Scalar UPPER_PURPLE = new Scalar(160, 255, 255);
 
-    private final Rect AREA = new Rect(270, 220, 150, 110);
+    private final Rect AREA = new Rect(290, 120, 150, 110);
 
     private Mat green = new Mat();
     private Mat orange = new Mat();

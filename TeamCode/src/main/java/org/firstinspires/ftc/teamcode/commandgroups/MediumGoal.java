@@ -15,7 +15,7 @@ public class MediumGoal extends ParallelCommandGroup {
     public MediumGoal(Rotation rotation, Extension extension, LimitSwitch extensionSwitch, LimitSwitch bottomSwitch, LimitSwitch topSwitch, Claw claw) {
         addCommands(
                 new CloseClaw(claw),
-                new Rotate(rotation, bottomSwitch, topSwitch, 125, 0.01),
+                new Rotate(rotation, bottomSwitch, topSwitch, 260, 0.01),
                 new Extend(extension, extensionSwitch, PoleLevel.MEDIUM)
         );
     }
