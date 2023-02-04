@@ -4,16 +4,16 @@ import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 
-public class OpenClaw extends CommandBase {
+public class OpenClawDeliver extends CommandBase {
     Claw claw;
 
-    public OpenClaw(Claw claw) {
+    public OpenClawDeliver(Claw claw) {
         this.claw = claw;
     }
 
     @Override
     public void initialize() {
-        claw.openBig();
+        claw.openSmall();
     }
 
     @Override

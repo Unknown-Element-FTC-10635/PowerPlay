@@ -8,7 +8,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.CurrentOpmode;
 
 public class Rotation extends SubsystemBase {
-    private static final int MAX_ANGLE = 260;
+    private static final int MAX_ANGLE = 220;
     private static final double MULTIPLIER = 5;
     private static final double MINIMUM_SPEED = 1.1;
 
@@ -50,6 +50,8 @@ public class Rotation extends SubsystemBase {
 
     public void manualRotation(double power) {
         rotation.setRunMode(Motor.RunMode.RawPower);
+
+        power = power * .9;
 
         if (power > 0 && currentAngle > MAX_ANGLE / 2.0) {
             rotation.set(power * calculateMulitpler(power));

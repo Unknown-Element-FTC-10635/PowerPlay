@@ -16,7 +16,7 @@ public class HighGoal extends ParallelCommandGroup {
     public HighGoal(Rotation rotation, LimitSwitch bottomSwitch, LimitSwitch topSwitch, Extension extension, LimitSwitch extensionSwitch, Claw claw) {
         addCommands(
                 new CloseClaw(claw),
-                new Rotate(rotation, bottomSwitch, topSwitch,260, 0.35),
+                new Rotate(rotation, bottomSwitch, topSwitch,220, 0.35),
                 new Extend(extension, extensionSwitch, PoleLevel.HIGH)
         );
     }

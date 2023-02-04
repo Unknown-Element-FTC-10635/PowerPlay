@@ -3,19 +3,13 @@ package org.firstinspires.ftc.teamcode.opmodes.autos;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.InstantCommand;
-import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.commandgroups.MediumGoal;
 import org.firstinspires.ftc.teamcode.commandgroups.PickPark;
-import org.firstinspires.ftc.teamcode.commandgroups.RotateHome;
 import org.firstinspires.ftc.teamcode.commands.CloseClaw;
 import org.firstinspires.ftc.teamcode.commands.FollowTrajectoryCommand;
-import org.firstinspires.ftc.teamcode.commands.OpenClaw;
-import org.firstinspires.ftc.teamcode.commands.Rotate;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
@@ -28,7 +22,7 @@ import org.firstinspires.ftc.teamcode.visionpipeline.SleeveDetection;
 
 import java.util.logging.Logger;
 
-@Autonomous(name = "RIGHT - Park")
+@Autonomous(name = "RIGHT - Park", group = "Right")
 public class RightPark extends CommandOpMode {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -75,7 +69,7 @@ public class RightPark extends CommandOpMode {
         telemetry.addLine("Starting Webcam");
         telemetry.update();
 
-        baseWebcam.startSleeveDetection();
+        baseWebcam.startSleeveDetection(true);
 
         telemetry.addLine("Ready to Start");
         telemetry.update();

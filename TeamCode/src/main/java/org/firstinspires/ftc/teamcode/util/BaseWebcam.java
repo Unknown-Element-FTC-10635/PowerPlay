@@ -28,8 +28,8 @@ public class BaseWebcam {
         this.hardwareMap = hardwareMap;
     }
 
-    public void startSleeveDetection() {
-        sleeveDetection = new SleeveDetection();
+    public void startSleeveDetection(boolean isRight) {
+        sleeveDetection = new SleeveDetection(isRight);
         start(sleeveDetection);
     }
 

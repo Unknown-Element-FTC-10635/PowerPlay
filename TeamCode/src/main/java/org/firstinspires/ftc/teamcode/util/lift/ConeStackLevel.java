@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.util.lift;
 
 public enum ConeStackLevel implements LiftHeight {
-    FIVE(850),
-    FOUR(675),
-    THREE(300),
+    FIVE(340),
+    FOUR(220),
+    THREE(200),
     TWO(200),
     ONE(0);
 

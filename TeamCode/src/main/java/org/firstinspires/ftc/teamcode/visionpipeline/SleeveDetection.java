@@ -10,17 +10,20 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class SleeveDetection extends OpenCvPipeline {
-    private final Scalar LOWER_GREEN = new Scalar(40, 10, 10);
-    private final Scalar UPPER_GREEN = new Scalar(80, 255, 255);
+    private final Scalar LOWER_GREEN = new Scalar(30, 15, 15);
+    private final Scalar UPPER_GREEN = new Scalar(90, 255, 255);
 
     private final Scalar LOWER_ORANGE = new Scalar(10, 20, 40);
     private final Scalar UPPER_ORANGE = new Scalar(35, 255, 255);
 
-    private final Scalar LOWER_PURPLE = new Scalar(130, 20, 40);
-    private final Scalar UPPER_PURPLE = new Scalar(160, 255, 255);
+    private final Scalar LOWER_PURPLE = new Scalar(120, 20, 30);
+    private final Scalar UPPER_PURPLE = new Scalar(170, 255, 255);
 
-    private final Rect AREA = new Rect(290, 120, 150, 110);
+    private Rect area;
 
     private Mat green = new Mat();
     private Mat orange = new Mat();
@@ -35,9 +38,17 @@ public class SleeveDetection extends OpenCvPipeline {
         UNKNOWN
     }
 
+    public SleeveDetection(boolean isRight) {
+        if (isRight) {
+            area = new Rect(340, 150, 150, 110);
+        } else {
+            area = new Rect(110, 150, 150, 110);
+        }
+    }
+
     @Override
     public Mat processFrame(Mat input) {
-        Mat searchArea = input.submat(AREA);
+        Mat searchArea = input.submat(area);
         Imgproc.cvtColor(searchArea, searchArea, Imgproc.COLOR_RGB2HSV);
         Imgproc.GaussianBlur(searchArea, searchArea, new Size(5, 5), 0);
 
@@ -58,7 +69,11 @@ public class SleeveDetection extends OpenCvPipeline {
                                     break;
             default:    boxColor =  new Scalar(255, 0, 0);
         }
-        Imgproc.rectangle(input, AREA, boxColor, 5);
+        Imgproc.rectangle(input, area, boxColor, 5);
+
+        Mat masks = new Mat();
+        List<Mat> src = Arrays.asList(green, orange, purple);
+        Core.hconcat(src, masks);
 
         return input;
     }

@@ -99,6 +99,10 @@ public class UKTeleOp extends OpMode {
             CommandScheduler.getInstance().schedule(new HighGoal(rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, extension, extensionLimitSwitch, claw));
         }
 
+        if (currentGamepad2.triangle && !previousGamepad2.triangle) {
+            CommandScheduler.getInstance().schedule(new HighGoal(rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, extension, extensionLimitSwitch, claw));
+        }
+
         if (currentGamepad1.square && !previousGamepad1.square) {
             CommandScheduler.getInstance().schedule(new LowGoal(rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, claw));
         }
@@ -111,6 +115,9 @@ public class UKTeleOp extends OpMode {
             CommandScheduler.getInstance().schedule(new Substation(rotation, extension, extensionLimitSwitch, rotationBottomLimitSwitch, rotationTopLimitSwitch, claw));
         }
 
+        if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
+            CommandScheduler.getInstance().schedule(new Substation(rotation, extension, extensionLimitSwitch, rotationBottomLimitSwitch, rotationTopLimitSwitch, claw));
+        }
 
         CommandScheduler.getInstance().run();
 
