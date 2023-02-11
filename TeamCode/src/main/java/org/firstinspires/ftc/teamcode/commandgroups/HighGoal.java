@@ -9,7 +9,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Extension;
 import org.firstinspires.ftc.teamcode.subsystems.LimitSwitch;
 import org.firstinspires.ftc.teamcode.subsystems.Rotation;
-import org.firstinspires.ftc.teamcode.util.color.TapeMeasureColor;
 import org.firstinspires.ftc.teamcode.util.lift.PoleLevel;
 
 public class HighGoal extends ParallelCommandGroup {
