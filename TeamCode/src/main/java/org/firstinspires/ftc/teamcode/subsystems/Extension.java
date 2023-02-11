@@ -39,7 +39,6 @@ public class Extension extends SubsystemBase {
         this.telemetry = telemetry;
 
         leftExtension = hardwareMap.get(DcMotorEx.class, "leftExtension"); //new Motor(hardwareMap, "leftExtension");
-        leftExtension.setDirection(DcMotorSimple.Direction.REVERSE);
         rightExtension = hardwareMap.get(DcMotorEx.class, "rightExtension"); //new Motor(hardwareMap, "rightExtension");
 
         reset();
@@ -85,6 +84,11 @@ public class Extension extends SubsystemBase {
     public void moveManual(double speed) {
         leftExtension.setPower(speed);
         rightExtension.setPower(speed);
+    }
+
+    public void moveManual(double leftPower, double rightPower) {
+        leftExtension.setPower(leftPower);
+        rightExtension.setPower(rightPower);
     }
 
     public void setTargetLevel(LiftHeight targetLevel) {

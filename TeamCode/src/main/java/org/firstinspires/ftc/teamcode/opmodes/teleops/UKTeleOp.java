@@ -62,6 +62,8 @@ public class UKTeleOp extends OpMode {
         rotation = new Rotation(hardwareMap, telemetry);
         claw = new Claw(hardwareMap, telemetry);
 
+        extension.setOverride(true);
+
         loopTime = new ElapsedTime();
         loopTime.startTime();
         telemetry.addLine("Waiting for start");
@@ -171,7 +173,7 @@ public class UKTeleOp extends OpMode {
                 if (gamepad2.right_bumper) {
                     extension.moveManual(1.0);
                 } else if (gamepad2.left_bumper) {
-                    extension.moveManual(-0.75);
+                    extension.moveManual(-0.0001, -1);
                 } else {
                     extension.stop();
                 }
@@ -186,10 +188,6 @@ public class UKTeleOp extends OpMode {
 
         if (rotationBottomLimitSwitch.isPressed()) {
             rotation.reset();
-        }
-
-        if (extensionLimitSwitch.isPressed()) {
-            extension.reset();
         }
 
         if (rotation.getAngle() < CLAW_CHANGE_STATE_ANGLE && claw.getCurrentOpenness() == Claw.Open.SMALL && claw.getCurrentState() == Claw.State.OPEN) {

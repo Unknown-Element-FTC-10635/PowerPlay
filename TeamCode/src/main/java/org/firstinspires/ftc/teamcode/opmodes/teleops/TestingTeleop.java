@@ -12,8 +12,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.teamcode.subsystems.Extension;
+
 @Config
-@Disabled
 @TeleOp
 public class TestingTeleop extends LinearOpMode {
     private PIDController pidController1, pidController2;
@@ -31,54 +32,21 @@ public class TestingTeleop extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        DcMotor frontLeft = hardwareMap.get(DcMotor.class, "fl");
-        DcMotor frontRight = hardwareMap.get(DcMotor.class, "fr");
-        DcMotor backLeft = hardwareMap.get(DcMotor.class, "bl");
-        DcMotor backRight = hardwareMap.get(DcMotor.class, "br");
+        //DcMotorEx leftExtesion = hardwareMap.get(DcMotorEx.class, "leftExtension");
+        //DcMotorEx rightExtension = hardwareMap.get(DcMotorEx.class, "rightExtension");
+
+        Extension extension = new Extension(hardwareMap, telemetry);
 
         waitForStart();
 
-        frontLeft.setPower(0.5);
-        Thread.sleep(500);
-        frontLeft.setPower(0);
-        backLeft.setPower(0.5);
-        Thread.sleep(500);
-        backLeft.setPower(0);
-        frontRight.setPower(0.5);
-        Thread.sleep(500);
-        frontRight.setPower(0);
-        backRight.setPower(0.5);
-        Thread.sleep(500);
-        backRight.setPower(0);
-
-        Thread.sleep(1000);
-
-        frontLeft.setPower(0.25);
-        Thread.sleep(500);
-        frontLeft.setPower(0);
-        backLeft.setPower(0.25);
-        Thread.sleep(500);
-        backLeft.setPower(0);
-        frontRight.setPower(0.25);
-        Thread.sleep(500);
-        frontRight.setPower(0);
-        backRight.setPower(0.25);
-        Thread.sleep(500);
-        backRight.setPower(0);
-
-        Thread.sleep(1000);
-
-        frontLeft.setPower(0.1);
-        Thread.sleep(500);
-        frontLeft.setPower(0);
-        backLeft.setPower(0.1);
-        Thread.sleep(500);
-        backLeft.setPower(0);
-        frontRight.setPower(0.1);
-        Thread.sleep(500);
-        frontRight.setPower(0);
-        backRight.setPower(0.1);
-        Thread.sleep(500);
-        backRight.setPower(0);
+        while (opModeIsActive()) {
+            if (gamepad1.right_bumper) {
+                extension.moveManual(1);
+            } else if (gamepad1.left_bumper) {
+                extension.moveManual(-0.5);
+            } else {
+                extension.moveManual(0);
+            }
+        }
     }
 }
