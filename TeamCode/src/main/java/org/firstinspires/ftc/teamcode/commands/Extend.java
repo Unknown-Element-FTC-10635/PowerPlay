@@ -4,10 +4,8 @@ import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.subsystems.Extension;
 import org.firstinspires.ftc.teamcode.subsystems.LimitSwitch;
-import org.firstinspires.ftc.teamcode.util.color.TapeMeasureColor;
 import org.firstinspires.ftc.teamcode.util.lift.LiftHeight;
 
-import java.lang.annotation.Target;
 import java.util.logging.Logger;
 
 public class Extend extends CommandBase {

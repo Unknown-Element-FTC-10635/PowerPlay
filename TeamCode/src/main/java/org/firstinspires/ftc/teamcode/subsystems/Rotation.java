@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -9,11 +11,11 @@ import org.firstinspires.ftc.teamcode.util.CurrentOpmode;
 
 public class Rotation extends SubsystemBase {
     private static final int MAX_ANGLE = 220;
-    private static final double MULTIPLIER = 5;
-    private static final double MINIMUM_SPEED = 1.1;
+    private static final double MULTIPLIER = 15;
+    private static final double MINIMUM_SPEED = 2.5;
 
     private final Telemetry telemetry;
-    private final Motor rotation;
+    private final DcMotorEx rotation;
     private double currentAngle = 0;
     private double targetPower = 0;
 
@@ -25,19 +27,19 @@ public class Rotation extends SubsystemBase {
     public Rotation(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
-        rotation = new Motor(hardwareMap, "rotation");
-        rotation.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        rotation = hardwareMap.get(DcMotorEx.class, "rotation"); //new Motor(hardwareMap, "rotation");
+        rotation.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        rotation.resetEncoder();
+        rotation.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rotation.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     @Override
     public void periodic() {
-        currentAngle = Math.max(0, -rotation.encoder.getPosition() / 22.8);
+        currentAngle = Math.max(0, rotation.getCurrentPosition() / 22.8);
 
         telemetry.addData("Rotation Current Angle", currentAngle);
-        telemetry.addData("Rotation Target Angle", targetAngle);
-        telemetry.addData("Rotation Raw Value", rotation.encoder.getPosition());
+        telemetry.addData("Rotation Raw Value", rotation.getCurrentPosition());
 
         if (CurrentOpmode.getCurrentOpmode() == CurrentOpmode.OpMode.AUTO) {
             //if (currentAngle <= MAX_ANGLE && targetPower > 0) {
@@ -49,16 +51,14 @@ public class Rotation extends SubsystemBase {
     }
 
     public void manualRotation(double power) {
-        rotation.setRunMode(Motor.RunMode.RawPower);
-
         power = power * .9;
 
         if (power > 0 && currentAngle > MAX_ANGLE / 2.0) {
-            rotation.set(power * calculateMulitpler(power));
+            rotation.setPower(power * calculateMulitpler(power));
         } else if (power < 0 && currentAngle < MAX_ANGLE / 2.0) {
-            rotation.set(power * calculateMulitpler(power));
+            rotation.setPower(power * calculateMulitpler(power));
         } else {
-            rotation.set(power);
+            rotation.setPower(power);
         }
 
         isMoving = (power != 0);
@@ -68,15 +68,13 @@ public class Rotation extends SubsystemBase {
     }
 
     public void rotateTo(int targetAngle, double power) {
-            rotation.setRunMode(Motor.RunMode.PositionControl);
-
             rotation.setTargetPosition(targetAngle);
 
             goingUp = targetAngle > currentAngle;
             if (goingUp) {
-                rotation.set(power);
+                rotation.setPower(power);
             } else {
-                rotation.set(-power);
+                rotation.setPower(-power);
             }
 
             this.targetAngle = targetAngle;
@@ -107,15 +105,14 @@ public class Rotation extends SubsystemBase {
     }
 
     public void stop() {
-        rotation.set(0);
-        rotation.stopMotor();
+        rotation.setPower(0);
         targetPower = 0;
         isMoving = false;
     }
 
     public void reset() {
-        rotation.resetEncoder();
-        rotation.encoder.reset();
+        rotation.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rotation.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public double getAngle() {
