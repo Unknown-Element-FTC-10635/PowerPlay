@@ -11,8 +11,8 @@ import org.firstinspires.ftc.teamcode.util.CurrentOpmode;
 
 public class Rotation extends SubsystemBase {
     private static final int MAX_ANGLE = 220;
-    private static final double MULTIPLIER = 15;
-    private static final double MINIMUM_SPEED = 2.5;
+    private static final double MULTIPLIER = 17;
+    private static final double MINIMUM_SPEED = 2.2;
 
     private final Telemetry telemetry;
     private final DcMotorEx rotation;
@@ -22,7 +22,6 @@ public class Rotation extends SubsystemBase {
     private int targetAngle;
 
     private boolean goingUp = false;
-    private boolean isMoving = false;
 
     public Rotation(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -36,35 +35,31 @@ public class Rotation extends SubsystemBase {
 
     @Override
     public void periodic() {
-        currentAngle = Math.max(0, rotation.getCurrentPosition() / 22.8);
+        currentAngle = Math.max(0, -rotation.getCurrentPosition() / 22.8);
 
         telemetry.addData("Rotation Current Angle", currentAngle);
-        telemetry.addData("Rotation Raw Value", rotation.getCurrentPosition());
+        //telemetry.addData("Rotation Raw Value", -rotation.getCurrentPosition());
 
         if (CurrentOpmode.getCurrentOpmode() == CurrentOpmode.OpMode.AUTO) {
-            //if (currentAngle <= MAX_ANGLE && targetPower > 0) {
-                //rotation.set(targetPower * calculateMulitpler(targetPower));
-            //}
-
             telemetry.update();
         }
     }
 
     public void manualRotation(double power) {
-        power = power * .9;
+        power = power * .7;
 
-        if (power > 0 && currentAngle > MAX_ANGLE / 2.0) {
-            rotation.setPower(power * calculateMulitpler(power));
+        rotation.setPower(power);
+
+        /*if (power > 0 && currentAngle > MAX_ANGLE / 2.0) {
+            rotation.setPower(power); //* calculateMulitpler(power));
         } else if (power < 0 && currentAngle < MAX_ANGLE / 2.0) {
-            rotation.setPower(power * calculateMulitpler(power));
+            rotation.setPower(power); //* calculateMulitpler(power));
         } else {
             rotation.setPower(power);
-        }
+        }*/
 
-        isMoving = (power != 0);
         telemetry.addData("Rotation Power", power);
         telemetry.addData("Rotation Multiplier", calculateMulitpler(power));
-        telemetry.addData("Rotation Moving", isMoving);
     }
 
     public void rotateTo(int targetAngle, double power) {
@@ -79,7 +74,6 @@ public class Rotation extends SubsystemBase {
 
             this.targetAngle = targetAngle;
             this.targetPower = power;
-            isMoving = true;
     }
 
     public boolean atTargetPosition() {
@@ -98,16 +92,9 @@ public class Rotation extends SubsystemBase {
         return 1 / (1 + lower + upper);
     }
 
-    private void detectIfStuck() {
-        if (isMoving) {
-
-        }
-    }
-
     public void stop() {
         rotation.setPower(0);
         targetPower = 0;
-        isMoving = false;
     }
 
     public void reset() {

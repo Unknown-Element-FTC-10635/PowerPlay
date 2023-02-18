@@ -13,11 +13,11 @@ import org.firstinspires.ftc.teamcode.util.color.TapeMeasureColor;
 import org.firstinspires.ftc.teamcode.util.lift.PoleLevel;
 
 public class HighGoal extends ParallelCommandGroup {
-    public HighGoal(Rotation rotation, LimitSwitch bottomSwitch, LimitSwitch topSwitch, Extension extension, LimitSwitch extensionSwitch, Claw claw) {
+    public HighGoal(Rotation rotation, LimitSwitch bottomSwitch, LimitSwitch topSwitch, Extension extension, LimitSwitch extensionLeftSwitch, LimitSwitch extensionRightSwitch, Claw claw) {
         addCommands(
                 new CloseClaw(claw),
                 new Rotate(rotation, bottomSwitch, topSwitch,220, 0.35),
-                new Extend(extension, extensionSwitch, PoleLevel.HIGH)
+                new Extend(extension, extensionLeftSwitch, extensionRightSwitch, PoleLevel.HIGH)
         );
     }
 }

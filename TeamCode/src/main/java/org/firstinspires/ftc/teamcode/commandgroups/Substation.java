@@ -12,11 +12,11 @@ import org.firstinspires.ftc.teamcode.subsystems.Rotation;
 import org.firstinspires.ftc.teamcode.util.lift.PoleLevel;
 
 public class Substation extends SequentialCommandGroup {
-    public Substation(Rotation rotation, Extension extension, LimitSwitch extensionLimitSwitch, LimitSwitch bottomSwitch, LimitSwitch topSwitch, Claw claw) {
+    public Substation(Rotation rotation, Extension extension, LimitSwitch extensionLeftSwitch, LimitSwitch extensionRightSwitch, LimitSwitch bottomSwitch, LimitSwitch topSwitch, Claw claw) {
         addCommands(
                 new ParallelCommandGroup(
                         new OpenClawDeliver(claw),
-                        new Extend(extension, extensionLimitSwitch, PoleLevel.SUBSTATION),
+                        new Extend(extension, extensionLeftSwitch, extensionRightSwitch, PoleLevel.SUBSTATION),
                         new Rotate(rotation, bottomSwitch, topSwitch, 30, 0.2)
                 ),
                 new RotateHome(rotation, bottomSwitch, topSwitch)

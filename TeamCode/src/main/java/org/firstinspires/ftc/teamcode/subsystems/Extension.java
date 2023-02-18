@@ -9,9 +9,11 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.commandgroups.Substation;
 import org.firstinspires.ftc.teamcode.util.CurrentOpmode;
 import org.firstinspires.ftc.teamcode.util.lift.LiftHeight;
 import org.firstinspires.ftc.teamcode.util.lift.PoleLevel;
+import org.opencv.core.Mat;
 
 @Config
 public class Extension extends SubsystemBase {
@@ -25,11 +27,11 @@ public class Extension extends SubsystemBase {
     private final PIDController leftPIDController;
     private final PIDController rightPIDController;
 
-    public static double pL = 0.00175, iL = 0, dL = 0.00001;
-    public static double fL = 0.001;
+    public static double pL = 0.0025, iL = 0, dL = 0.00001;
+    public static double fL = 0.01;
 
-    public static double pR = 0.006, iR = 0, dR = 0.0001;
-    public static double fR = 0.0125;
+    public static double pR = 0.002, iR = 0, dR = 0.000005;
+    public static double fR = 0.0021;
 
     private static final double TICKS_PER_DEGREE = 537.7 / 360;
 
@@ -40,8 +42,10 @@ public class Extension extends SubsystemBase {
 
         leftExtension = hardwareMap.get(DcMotorEx.class, "leftExtension"); //new Motor(hardwareMap, "leftExtension");
         rightExtension = hardwareMap.get(DcMotorEx.class, "rightExtension"); //new Motor(hardwareMap, "rightExtension");
+        rightExtension.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        reset();
+        resetLeft();
+        resetRight();
 
         leftPIDController = new PIDController(pL, iL, dL);
         rightPIDController = new PIDController(pR, iR, dR);
@@ -97,11 +101,7 @@ public class Extension extends SubsystemBase {
 
     public boolean atTargetLevel() {
         double average = (leftExtension.getCurrentPosition() + rightExtension.getCurrentPosition()) / 2.0;
-        if (average < targetLevel.getHeight() + 5 && average > targetLevel.getHeight() - 5) {
-            return true;
-        } else {
-            return false;
-        }
+        return average < targetLevel.getHeight() + 5 && average > targetLevel.getHeight() - 5;
     }
 
     @Override
@@ -118,20 +118,21 @@ public class Extension extends SubsystemBase {
 
         telemetry.addData("Extension Target", targetLevel);
         telemetry.addData("Extension Target Encoder", targetLevel.getHeight());
-        telemetry.addData("Left Extension", leftExtension.getCurrentPosition());
-        telemetry.addData("Right Extension", rightExtension.getCurrentPosition());
+        telemetry.addData("Left Extension", Math.abs(leftExtension.getCurrentPosition()));
+        telemetry.addData("Right Extension", Math.abs(rightExtension.getCurrentPosition()));
     }
 
 
     private void movePID(double level) {
         double cos = Math.cos(Math.toRadians(level / TICKS_PER_DEGREE));
 
-        double pidLeft = leftPIDController.calculate(leftExtension.getCurrentPosition(), level);
+        double pidLeft = leftPIDController.calculate(Math.abs(leftExtension.getCurrentPosition()), level);
         double ffLeft = cos * fL;
 
         leftExtension.setPower(pidLeft + ffLeft);
 
-        double pidRight = rightPIDController.calculate(rightExtension.getCurrentPosition(), level);
+        double pidRight;
+        pidRight = rightPIDController.calculate(Math.abs(rightExtension.getCurrentPosition()), level);
         double ffRight = cos * fR;
 
         rightExtension.setPower(pidRight + ffRight);
@@ -142,11 +143,13 @@ public class Extension extends SubsystemBase {
         rightExtension.setPower(0);
     }
 
-    public void reset() {
+    public void resetLeft() {
         leftExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
         leftExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void resetRight() {
+        rightExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 

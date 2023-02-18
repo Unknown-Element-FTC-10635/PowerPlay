@@ -12,12 +12,13 @@ public class Extend extends CommandBase {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     private final Extension extension;
-    private final LimitSwitch extensionSwitch;
+    private final LimitSwitch extensionLeftSwitch, extensionRightSwitch;
     private final LiftHeight level;
 
-    public Extend(Extension extension, LimitSwitch extensionSwitch, LiftHeight level) {
+    public Extend(Extension extension, LimitSwitch extensionLeftSwitch, LimitSwitch extensionRightSwitch, LiftHeight level) {
         this.extension = extension;
-        this.extensionSwitch = extensionSwitch;
+        this.extensionLeftSwitch = extensionLeftSwitch;
+        this.extensionRightSwitch = extensionRightSwitch;
         this.level = level;
 
     }
@@ -34,8 +35,11 @@ public class Extend extends CommandBase {
         if (extension.atTargetLevel()) {
             logger.info("Finished Extension from Position");
             return true;
-        } else if (extensionSwitch.isPressed()) {
-            logger.info("Finished Extension from Limit Switch");
+        } else if (extensionLeftSwitch.isPressed()) {
+            logger.info("Finished Extension from Left Limit Switch");
+            return true;
+        } else if (extensionRightSwitch.isPressed()) {
+            logger.info("Finished Extension from Right Limit Switch");
             return true;
         } else {
             return false;

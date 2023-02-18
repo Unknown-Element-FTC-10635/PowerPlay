@@ -18,14 +18,14 @@ import org.firstinspires.ftc.teamcode.subsystems.Rotation;
 import org.firstinspires.ftc.teamcode.util.lift.LiftHeight;
 
 public class PickUpStack extends SequentialCommandGroup {
-    public PickUpStack(SampleMecanumDrive drive, Extension extension, Rotation rotation, LimitSwitch rotationBottomSwitch, LimitSwitch rotationTopSwitch, LimitSwitch extensionLimitSwitch, Claw claw, TrajectorySequence pickUpStackPosition, LiftHeight level) {
+    public PickUpStack(SampleMecanumDrive drive, Extension extension, Rotation rotation, LimitSwitch rotationBottomSwitch, LimitSwitch rotationTopSwitch, LimitSwitch extensionLeftSwitch, LimitSwitch extensionRightSwitch, Claw claw, TrajectorySequence pickUpStackPosition, LiftHeight level) {
         addCommands(
                 new ParallelCommandGroup(
                         new OpenClawPickUp(claw),
                         new Rotate(rotation, rotationBottomSwitch, rotationTopSwitch, 15, 0.2),
                         new SequentialCommandGroup(
                                 new WaitCommand(250),
-                                new Extend(extension, extensionLimitSwitch, level)
+                                new Extend(extension, extensionLeftSwitch, extensionRightSwitch, level)
                         ),
                         new FollowTrajectoryCommand(drive, pickUpStackPosition)
                 ),
