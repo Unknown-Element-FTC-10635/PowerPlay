@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -11,17 +10,18 @@ import org.firstinspires.ftc.teamcode.util.CurrentOpmode;
 
 public class Rotation extends SubsystemBase {
     private static final int MAX_ANGLE = 220;
-    private static final double MULTIPLIER = 17;
+    private static final double MULTIPLIER = 6;
     private static final double MINIMUM_SPEED = 2.2;
 
     private final Telemetry telemetry;
     private final DcMotorEx rotation;
     private double currentAngle = 0;
-    private double targetPower = 0;
 
     private int targetAngle;
 
     private boolean goingUp = false;
+
+    private boolean enableSlowdown = false;
 
     public Rotation(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -46,17 +46,17 @@ public class Rotation extends SubsystemBase {
     }
 
     public void manualRotation(double power) {
-        //power = power * .8;
-
-        rotation.setPower(power);
-
-        /*if (power > 0 && currentAngle > MAX_ANGLE / 2.0) {
-            rotation.setPower(power); //* calculateMulitpler(power));
-        } else if (power < 0 && currentAngle < MAX_ANGLE / 2.0) {
-            rotation.setPower(power); //* calculateMulitpler(power));
+        if (enableSlowdown) {
+            if (power > 0 && currentAngle > MAX_ANGLE / 2.0) {
+                rotation.setPower(power * calculateMulitpler(power));
+            } else if (power < 0 && currentAngle < MAX_ANGLE / 2.0) {
+                rotation.setPower(power * calculateMulitpler(power));
+            } else {
+                rotation.setPower(power);
+            }
         } else {
             rotation.setPower(power);
-        }*/
+        }
 
         telemetry.addData("Rotation Power", power);
         telemetry.addData("Rotation Multiplier", calculateMulitpler(power));
@@ -67,7 +67,6 @@ public class Rotation extends SubsystemBase {
         rotation.setPower(power);
 
         this.targetAngle = targetAngle;
-        this.targetPower = power;
     }
 
     public void rotateTo(boolean top, double power) {
@@ -78,8 +77,6 @@ public class Rotation extends SubsystemBase {
             goingUp = false;
             rotation.setPower(-power);
         }
-
-        this.targetPower = power;
     }
 
     public boolean atTargetPosition() {
@@ -92,7 +89,7 @@ public class Rotation extends SubsystemBase {
     }
 
     private double calculateMulitpler(double power) {
-        // https://www.desmos.com/calculator/xegbrro6fw
+        // https://www.desmos.com/calculator/x7f6r2ixmu
         double lower = Math.pow(Math.E, -((1.0 / MULTIPLIER) * (Math.abs(currentAngle)) - MINIMUM_SPEED));
         double upper = Math.pow(Math.E, -((1.0 / MULTIPLIER) * (MAX_ANGLE - Math.abs(currentAngle)) - MINIMUM_SPEED));
         return 1 / (1 + lower + upper);
@@ -100,7 +97,6 @@ public class Rotation extends SubsystemBase {
 
     public void stop() {
         rotation.setPower(0);
-        targetPower = 0;
     }
 
     public void reset() {
@@ -114,5 +110,13 @@ public class Rotation extends SubsystemBase {
 
     public boolean isGoingUp() {
         return goingUp;
+    }
+
+    public void setEnableSlowdown(boolean enableSlowdown) {
+        this.enableSlowdown = enableSlowdown;
+    }
+
+    public boolean isEnableSlowdown() {
+        return enableSlowdown;
     }
 }

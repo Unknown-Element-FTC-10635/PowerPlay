@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.commandgroups.LowGoal;
 import org.firstinspires.ftc.teamcode.commandgroups.MediumGoal;
 import org.firstinspires.ftc.teamcode.commandgroups.Substation;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
+import org.firstinspires.ftc.teamcode.subsystems.ColorSensor;
 import org.firstinspires.ftc.teamcode.subsystems.Extension;
 import org.firstinspires.ftc.teamcode.subsystems.LimitSwitch;
 import org.firstinspires.ftc.teamcode.subsystems.Rotation;
@@ -27,6 +28,7 @@ public class UKTeleOp extends OpMode {
     private DcMotor frontLeft, frontRight, backLeft, backRight;
 
     private LimitSwitch extensionLeftLimitSwitch, extensionRightLimitSwitch, rotationBottomLimitSwitch, rotationTopLimitSwitch;
+    private ColorSensor colorSensors;
     private Extension extension;
     private Rotation rotation;
     private Claw claw;
@@ -40,6 +42,8 @@ public class UKTeleOp extends OpMode {
 
     private boolean speedToggle = false;
     private double wheelMultiplier = 0.8;
+
+    private boolean rumbleToggle = true;
 
     @Override
     public void init() {
@@ -59,6 +63,7 @@ public class UKTeleOp extends OpMode {
         extensionRightLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "extensionRSW");
         rotationBottomLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "rotationBSW");
         rotationTopLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "rotationTSW");
+        colorSensors = new ColorSensor(hardwareMap, telemetry);
         extension = new Extension(hardwareMap, telemetry);
         rotation = new Rotation(hardwareMap, telemetry);
         claw = new Claw(hardwareMap, telemetry);
@@ -73,7 +78,7 @@ public class UKTeleOp extends OpMode {
 
     @Override
     public void start() {
-        CommandScheduler.getInstance().registerSubsystem(rotation, rotationBottomLimitSwitch, extensionLeftLimitSwitch, extensionRightLimitSwitch, extension, claw, rotationTopLimitSwitch);
+        CommandScheduler.getInstance().registerSubsystem(rotation, rotationBottomLimitSwitch, extensionLeftLimitSwitch, extensionRightLimitSwitch, extension, claw, rotationTopLimitSwitch, colorSensors);
 
         extension.resetLeft();
         extension.resetRight();
@@ -202,6 +207,24 @@ public class UKTeleOp extends OpMode {
 
         if (extensionRightLimitSwitch.isPressed()) {
             extension.resetRight();
+        }
+
+        if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up) {
+            rumbleToggle = !rumbleToggle;
+        }
+
+        if (rumbleToggle && !gamepad1.isRumbling()) {
+            if (colorSensors.leftNotGreen() && colorSensors.rightNotGreen()) {
+                gamepad1.rumble(1, 1, 100);
+            } else if (colorSensors.leftNotGreen()) {
+                gamepad1.rumble(1, 0, 100);
+            } else if (colorSensors.rightNotGreen()) {
+                gamepad1.rumble(0, 1, 100);
+            }
+        }
+
+        if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
+            rotation.setEnableSlowdown(!rotation.isEnableSlowdown());
         }
 
         telemetry.addData("Loop Time", loopTime.milliseconds());
