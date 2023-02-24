@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.commandgroups.Substation;
@@ -27,7 +28,7 @@ public class Extension extends SubsystemBase {
     private final PIDController leftPIDController;
     private final PIDController rightPIDController;
 
-    public static double pL = 0.0025, iL = 0, dL = 0.00001;
+    public static double pL = 0.0025, iL = 0, dL = 0.000008;
     public static double fL = 0.012;
 
     public static double pR = 0.002, iR = 0, dR = 0.000005;
@@ -146,13 +147,18 @@ public class Extension extends SubsystemBase {
         double pidLeft = leftPIDController.calculate(Math.abs(leftExtension.getCurrentPosition()), level);
         double ffLeft = cos * fL;
 
-        leftExtension.setPower(pidLeft + ffLeft);
 
         double pidRight;
-        pidRight = rightPIDController.calculate(Math.abs(rightExtension.getCurrentPosition()), level);
+        pidRight = rightPIDController.calculate(Math.abs(rightExtension.getCurrentPosition()), level * 1.03);
         double ffRight = cos * fR;
 
-        rightExtension.setPower(pidRight + ffRight);
+        /*
+        double lPos = leftExtension.getCurrentPosition();
+        double x = lPos - rightExtension.getCurrentPosition();
+        x = 1 + (x / lPos);*/
+
+        leftExtension.setPower(pidLeft + ffLeft);
+        rightExtension.setPower((pidRight + ffRight));
     }
 
     public void stop() {

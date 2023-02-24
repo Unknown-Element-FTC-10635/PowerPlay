@@ -71,10 +71,10 @@ public class Right12Auto extends CommandOpMode {
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, DriveConstants.TRACK_WIDTH))
                 .splineTo(new Vector2d(-36, 40), Math.toRadians(270))
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(100, 100, DriveConstants.TRACK_WIDTH))
-                .lineTo(new Vector2d(-34, 5))
+                .lineTo(new Vector2d(-33.5, 5))
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, DriveConstants.TRACK_WIDTH))
                 .back(8)
-                .lineToSplineHeading(new Pose2d(-37, 11.5, Math.toRadians(135)))
+                .lineToSplineHeading(new Pose2d(-36, 12, Math.toRadians(135)))
                 .back(10)
                 .build();
 
@@ -88,7 +88,7 @@ public class Right12Auto extends CommandOpMode {
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, DriveConstants.TRACK_WIDTH))
                 .setReversed(true)
                 .lineTo(new Vector2d(-40, 12))
-                .splineTo(new Vector2d(-30, 6), Math.toRadians(300))
+                .splineTo(new Vector2d(-29, 6), Math.toRadians(300))
                 .build();
 
         TrajectorySequence setUpPark = drive.trajectorySequenceBuilder(approachPole.end())
@@ -100,11 +100,11 @@ public class Right12Auto extends CommandOpMode {
                 .build();
 
         TrajectorySequence purple = drive.trajectorySequenceBuilder(setUpPark.end())
-                .lineTo(new Vector2d(-10, 16))
+                .lineTo(new Vector2d(-11, 14))
                 .build();
 
         TrajectorySequence green = drive.trajectorySequenceBuilder(setUpPark.end())
-                .lineTo(new Vector2d(-60, 16))
+                .lineTo(new Vector2d(-60, 15))
                 .build();
 
         telemetry.addLine("Starting Webcam");
@@ -141,7 +141,7 @@ public class Right12Auto extends CommandOpMode {
                                         new HighGoal(rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, claw)
                                 )
                         ),
-                        new WaitCommand(250),
+                        new WaitCommand(200),
                         new OpenClawDeliver(claw),
                         new WaitCommand(100),
                         // -- PRELOAD --

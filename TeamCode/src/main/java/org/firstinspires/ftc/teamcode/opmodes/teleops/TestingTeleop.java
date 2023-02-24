@@ -10,23 +10,23 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
-@Disabled
 @Config
 @TeleOp
 public class TestingTeleop extends OpMode {
     private PIDController pidController1, pidController2;
     private DcMotorEx leftExtension, rightExtension;
 
-    public static double pL = 0.0025, iL = 0, dL = 0.00001;
-    public static double fL = 0.01;
+    public static double pL = 0.0025, iL = 0, dL = 0.000008;
+    public static double fL = 0.012;
 
     public static double pR = 0.002, iR = 0, dR = 0.000005;
-    public static double fR = 0.0022;
+    public static double fR = 0.0023;
 
     public static int target = 0;
 
-    private static final double TICKS_PER_DEGREE = 384.5 / 360;
+    private static final double TICKS_PER_DEGREE = 537.7 / 360;
 
     @Override
     public void init() {

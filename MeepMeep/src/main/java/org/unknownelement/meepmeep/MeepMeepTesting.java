@@ -27,28 +27,29 @@ public class MeepMeepTesting {
 
                 // Creates a trajectory
                 .followTrajectorySequence(driveShim ->
-                        driveShim.trajectorySequenceBuilder(new Pose2d(-33.0, 64, Math.toRadians(270)))
+                        driveShim.trajectorySequenceBuilder(new Pose2d(-33.0, -64, Math.toRadians(90)))
                                 // Preload
                                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, 15.15))
-                                .splineTo(new Vector2d(-36, 40), Math.toRadians(270))
+                                .splineTo(new Vector2d(-36, -40), Math.toRadians(90))
                                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(100, 100, 15.15))
-                                .lineTo(new Vector2d(-36, 5))
+                                .lineTo(new Vector2d(-36, -5))
                                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, 15.15))
                                 .back(8)
-                                .lineToSplineHeading(new Pose2d(-37, 12, Math.toRadians(225)))
-                                .back(11)
+                                .lineToSplineHeading(new Pose2d(-37, -15.75, Math.toRadians(225)))
+                                .back(11.5)
 
                                 .waitSeconds(0.25)
 
                                 // Pick up
-                                .splineTo(new Vector2d(-40, 12), Math.toRadians(180))
-                                .lineTo(new Vector2d(-62, 12))
+                                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(50, 50, 15.15))
+                                .splineTo(new Vector2d(-40, -12), Math.toRadians(180))
+                                .lineTo(new Vector2d(-60, -12))
 
                                 // Pole
                                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, 15.15))
                                 .setReversed(true)
-                                .lineTo(new Vector2d(-40, 12))
-                                .splineTo(new Vector2d(-30, 18), Math.toRadians(30))
+                                .lineTo(new Vector2d(-40, -12))
+                                .splineTo(new Vector2d(-29, -7), Math.toRadians(30))
 
                                 .build()
                 );

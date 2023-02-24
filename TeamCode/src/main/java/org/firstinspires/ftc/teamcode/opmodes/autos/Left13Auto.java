@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.commands.CloseClaw;
 import org.firstinspires.ftc.teamcode.commands.Extend;
 import org.firstinspires.ftc.teamcode.commands.FollowTrajectoryCommand;
 import org.firstinspires.ftc.teamcode.commands.OpenClawDeliver;
+import org.firstinspires.ftc.teamcode.commands.OpenClawPickUp;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
@@ -73,21 +74,21 @@ public class Left13Auto extends CommandOpMode {
                 .lineTo(new Vector2d(-36, -5))
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, DriveConstants.TRACK_WIDTH))
                 .back(8)
-                .lineToSplineHeading(new Pose2d(-37, -15.75, Math.toRadians(225)))
-                .back(11.5)
+                .lineToSplineHeading(new Pose2d(-37, -15.5, Math.toRadians(230)))
+                .back(10)
                 .build();
 
         TrajectorySequence pickUpStackPosition = drive.trajectorySequenceBuilder(preloadDelivery.end())
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(50, 50, DriveConstants.TRACK_WIDTH))
-                .splineTo(new Vector2d(-40, -12), Math.toRadians(180))
-                .lineTo(new Vector2d(-60, -12))
+                .splineTo(new Vector2d(-40, -13.5), Math.toRadians(180))
+                .lineTo(new Vector2d(-61, -13.5))
                 .build();
 
         TrajectorySequence approachPole = drive.trajectorySequenceBuilder(pickUpStackPosition.end())
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, DriveConstants.TRACK_WIDTH))
                 .setReversed(true)
                 .lineTo(new Vector2d(-40, -12))
-                .splineTo(new Vector2d(-30, -6), Math.toRadians(300))
+                .splineTo(new Vector2d(-30, -8), Math.toRadians(30))
                 .build();
 
         TrajectorySequence setUpPark = drive.trajectorySequenceBuilder(approachPole.end())
@@ -99,11 +100,11 @@ public class Left13Auto extends CommandOpMode {
                 .build();
 
         TrajectorySequence purple = drive.trajectorySequenceBuilder(setUpPark.end())
-                .lineTo(new Vector2d(-60, -16))
+                .lineTo(new Vector2d(-60, -15))
                 .build();
 
         TrajectorySequence green = drive.trajectorySequenceBuilder(setUpPark.end())
-                .lineTo(new Vector2d(-10, -16))
+                .lineTo(new Vector2d(-11, -14))
                 .build();
 
         telemetry.addLine("Starting Webcam");
@@ -111,9 +112,9 @@ public class Left13Auto extends CommandOpMode {
 
         baseWebcam.startSleeveDetection(false);
 
+
         telemetry.addLine("Ready to Start");
         telemetry.update();
-
 
         waitForStart();
 
@@ -140,7 +141,7 @@ public class Left13Auto extends CommandOpMode {
                                         new HighGoal(rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, claw)
                                 )
                         ),
-                        new WaitCommand(250),
+                        new WaitCommand(200),
                         new OpenClawDeliver(claw),
                         new WaitCommand(100),
                         // -- PRELOAD --
@@ -189,6 +190,7 @@ public class Left13Auto extends CommandOpMode {
 
                         new Substation(rotation, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, rotationBottomLimitSwitch, rotationTopLimitSwitch, claw),
                         new FollowTrajectoryCommand(drive, setUpPark),
+                        new OpenClawPickUp(claw),
                         new PickPark(drive, sleeveColor, purple, orange, green),
 
                         new InstantCommand(() -> logger.info("Finished Program"))
