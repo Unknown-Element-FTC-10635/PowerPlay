@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.commands.Extend;
 import org.firstinspires.ftc.teamcode.commands.FollowTrajectoryCommand;
 import org.firstinspires.ftc.teamcode.commands.OpenClawPickUp;
 import org.firstinspires.ftc.teamcode.commands.Rotate;
+import org.firstinspires.ftc.teamcode.commands.RotateZero;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
@@ -22,15 +23,17 @@ public class PickUpStack extends SequentialCommandGroup {
         addCommands(
                 new ParallelCommandGroup(
                         new OpenClawPickUp(claw),
-                        new Rotate(rotation, rotationBottomSwitch, rotationTopSwitch, 15, 0.2),
+                        new RotateHome(rotation, rotationBottomSwitch, rotationTopSwitch),
                         new SequentialCommandGroup(
-                                new WaitCommand(250),
+                                new WaitCommand(225),
                                 new Extend(extension, extensionLeftSwitch, extensionRightSwitch, level)
                         ),
                         new FollowTrajectoryCommand(drive, pickUpStackPosition)
                 ),
-                new CloseClaw(claw),
-                new WaitCommand(250)
+                new ParallelCommandGroup(
+                        new CloseClaw(claw),
+                        new WaitCommand(150)
+                )
         );
     }
 }

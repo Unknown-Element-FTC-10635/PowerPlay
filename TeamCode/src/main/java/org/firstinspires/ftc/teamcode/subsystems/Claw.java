@@ -49,7 +49,7 @@ public class Claw extends SubsystemBase {
     }
 
     public void openSmall() {
-        servo.setPosition(0.54);
+        servo.setPosition(0.52);
 
         currentState = State.OPEN;
         currentOpenness = Open.SMALL;
@@ -68,4 +68,6 @@ public class Claw extends SubsystemBase {
     public Open getCurrentOpenness() {
         return currentOpenness;
     }
+
+
 }

@@ -21,7 +21,7 @@ public class MeepMeepTesting {
                 .setColorScheme(new ColorSchemeBlueLight())
 
                 // Set constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(60, 60, Math.toRadians(361.40679297895304), Math.toRadians(180), 13.375)
+                .setConstraints(60, 60, Math.toRadians(361.40679297895304), Math.toRadians(180), 15.15)
 
                 .setDimensions(16.8, 16)
 
@@ -29,11 +29,14 @@ public class MeepMeepTesting {
                 .followTrajectorySequence(driveShim ->
                         driveShim.trajectorySequenceBuilder(new Pose2d(-33.0, 64, Math.toRadians(270)))
                                 // Preload
-                                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, 13.375))
+                                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, 15.15))
                                 .splineTo(new Vector2d(-36, 40), Math.toRadians(270))
-                                .lineToSplineHeading(new Pose2d(-35, 11, Math.toRadians(135)))
-                                .strafeRight(0.6)
+                                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(100, 100, 15.15))
+                                .lineTo(new Vector2d(-36, 5))
+                                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, 15.15))
                                 .back(8)
+                                .lineToSplineHeading(new Pose2d(-37, 12, Math.toRadians(225)))
+                                .back(11)
 
                                 .waitSeconds(0.25)
 
@@ -42,11 +45,10 @@ public class MeepMeepTesting {
                                 .lineTo(new Vector2d(-62, 12))
 
                                 // Pole
+                                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, 15.15))
                                 .setReversed(true)
-                                .lineTo(new Vector2d(-50, 11))
-                                .lineToSplineHeading(new Pose2d(-35, 11, Math.toRadians(135)))
-                                .strafeRight(0.6)
-                                .back(8)
+                                .lineTo(new Vector2d(-40, 12))
+                                .splineTo(new Vector2d(-30, 18), Math.toRadians(30))
 
                                 .build()
                 );

@@ -28,14 +28,17 @@ public class Extension extends SubsystemBase {
     private final PIDController rightPIDController;
 
     public static double pL = 0.0025, iL = 0, dL = 0.00001;
-    public static double fL = 0.01;
+    public static double fL = 0.012;
 
     public static double pR = 0.002, iR = 0, dR = 0.000005;
-    public static double fR = 0.0021;
+    public static double fR = 0.0023;
 
     private static final double TICKS_PER_DEGREE = 537.7 / 360;
 
     private boolean override = false;
+
+    // Limit Switch
+    LimitSwitch extensionLeftLimitSwitch, extensionRightLimitSwitch;
 
     public Extension(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -49,11 +52,18 @@ public class Extension extends SubsystemBase {
 
         leftPIDController = new PIDController(pL, iL, dL);
         rightPIDController = new PIDController(pR, iR, dR);
+
+        if (CurrentOpmode.getCurrentOpmode() == CurrentOpmode.OpMode.AUTO) {
+            extensionLeftLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "extensionLSW");
+            extensionRightLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "extensionRSW");
+
+            extensionLeftLimitSwitch.setInverted(true);
+        }
     }
 
     public void upLevel() {
         targetLevel = PoleLevel.getClosestHeight(targetLevel);
-        switch ((PoleLevel)targetLevel) {
+        switch ((PoleLevel) targetLevel) {
             case SUBSTATION:
             case LOW:
                 targetLevel = PoleLevel.MEDIUM;
@@ -70,7 +80,7 @@ public class Extension extends SubsystemBase {
 
     public void downLevel() {
         targetLevel = PoleLevel.getClosestHeight(targetLevel);
-        switch ((PoleLevel)targetLevel) {
+        switch ((PoleLevel) targetLevel) {
             case LOW:
             case MEDIUM:
                 targetLevel = PoleLevel.SUBSTATION;
@@ -113,6 +123,13 @@ public class Extension extends SubsystemBase {
         }
 
         if (CurrentOpmode.getCurrentOpmode() == CurrentOpmode.OpMode.AUTO) {
+            if (extensionLeftLimitSwitch.isPressed()) {
+                resetLeft();
+            }
+            if (extensionRightLimitSwitch.isPressed()) {
+                resetRight();
+            }
+
             movePID(targetLevel.getHeight());
         }
 

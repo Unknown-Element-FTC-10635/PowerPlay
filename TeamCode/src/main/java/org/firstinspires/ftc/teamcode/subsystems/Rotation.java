@@ -35,10 +35,10 @@ public class Rotation extends SubsystemBase {
 
     @Override
     public void periodic() {
-        currentAngle = Math.max(0, -rotation.getCurrentPosition() / 22.8);
+        currentAngle = Math.max(0, rotation.getCurrentPosition() / (2786.2 / 360));
 
         telemetry.addData("Rotation Current Angle", currentAngle);
-        //telemetry.addData("Rotation Raw Value", -rotation.getCurrentPosition());
+        telemetry.addData("Rotation Raw Value", rotation.getCurrentPosition());
 
         if (CurrentOpmode.getCurrentOpmode() == CurrentOpmode.OpMode.AUTO) {
             telemetry.update();
@@ -46,7 +46,7 @@ public class Rotation extends SubsystemBase {
     }
 
     public void manualRotation(double power) {
-        power = power * .7;
+        //power = power * .8;
 
         rotation.setPower(power);
 
@@ -63,17 +63,23 @@ public class Rotation extends SubsystemBase {
     }
 
     public void rotateTo(int targetAngle, double power) {
-            rotation.setTargetPosition(targetAngle);
+        goingUp = targetAngle > currentAngle;
+        rotation.setPower(power);
 
-            goingUp = targetAngle > currentAngle;
-            if (goingUp) {
-                rotation.setPower(power);
-            } else {
-                rotation.setPower(-power);
-            }
+        this.targetAngle = targetAngle;
+        this.targetPower = power;
+    }
 
-            this.targetAngle = targetAngle;
-            this.targetPower = power;
+    public void rotateTo(boolean top, double power) {
+        if (top) {
+            goingUp = true;
+            rotation.setPower(power);
+        } else {
+            goingUp = false;
+            rotation.setPower(-power);
+        }
+
+        this.targetPower = power;
     }
 
     public boolean atTargetPosition() {

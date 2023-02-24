@@ -40,9 +40,9 @@ public class SleeveDetection extends OpenCvPipeline {
 
     public SleeveDetection(boolean isRight) {
         if (isRight) {
-            area = new Rect(340, 150, 150, 110);
+            area = new Rect(340, 300, 150, 110);
         } else {
-            area = new Rect(110, 150, 150, 110);
+            area = new Rect(110, 300, 150, 110);
         }
     }
 

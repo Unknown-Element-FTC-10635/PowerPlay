@@ -4,7 +4,7 @@ public enum PoleLevel implements LiftHeight {
     SUBSTATION(0),
     LOW(100),
     MEDIUM(625),
-    HIGH(1500),
+    HIGH(1450),
     EXTRA_TALL(1600);
 
     private final int height;

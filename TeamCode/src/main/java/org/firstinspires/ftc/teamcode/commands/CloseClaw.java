@@ -18,6 +18,6 @@ public class CloseClaw extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return (claw.getCurrentState() == Claw.State.CLOSED);
+        return true;
     }
 }

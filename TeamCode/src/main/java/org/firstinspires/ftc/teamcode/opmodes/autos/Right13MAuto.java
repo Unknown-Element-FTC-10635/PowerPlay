@@ -11,7 +11,7 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.commandgroups.HighGoal;
+import org.firstinspires.ftc.teamcode.commandgroups.MediumGoal;
 import org.firstinspires.ftc.teamcode.commandgroups.PickPark;
 import org.firstinspires.ftc.teamcode.commandgroups.PickUpStack;
 import org.firstinspires.ftc.teamcode.commandgroups.Substation;
@@ -34,8 +34,8 @@ import org.firstinspires.ftc.teamcode.visionpipeline.SleeveDetection;
 
 import java.util.logging.Logger;
 
-@Autonomous(name = "RIGHT (1+2) - High", group = "Right")
-public class Right12Auto extends CommandOpMode {
+@Autonomous(name = "RIGHT (1+3) - Medium", group = "Right")
+public class Right13MAuto extends CommandOpMode {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     @Override
@@ -71,11 +71,11 @@ public class Right12Auto extends CommandOpMode {
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, DriveConstants.TRACK_WIDTH))
                 .splineTo(new Vector2d(-36, 40), Math.toRadians(270))
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(100, 100, DriveConstants.TRACK_WIDTH))
-                .lineTo(new Vector2d(-34, 5))
+                .lineTo(new Vector2d(-35, 5))
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, DriveConstants.TRACK_WIDTH))
                 .back(8)
-                .lineToSplineHeading(new Pose2d(-37, 11.5, Math.toRadians(135)))
-                .back(10)
+                .lineToSplineHeading(new Pose2d(-37, 12, Math.toRadians(225)))
+                .back(11)
                 .build();
 
         TrajectorySequence pickUpStackPosition = drive.trajectorySequenceBuilder(preloadDelivery.end())
@@ -88,7 +88,7 @@ public class Right12Auto extends CommandOpMode {
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, DriveConstants.TRACK_WIDTH))
                 .setReversed(true)
                 .lineTo(new Vector2d(-40, 12))
-                .splineTo(new Vector2d(-30, 6), Math.toRadians(300))
+                .splineTo(new Vector2d(-27, 19), Math.toRadians(45))
                 .build();
 
         TrajectorySequence setUpPark = drive.trajectorySequenceBuilder(approachPole.end())
@@ -100,7 +100,7 @@ public class Right12Auto extends CommandOpMode {
                 .build();
 
         TrajectorySequence purple = drive.trajectorySequenceBuilder(setUpPark.end())
-                .lineTo(new Vector2d(-10, 16))
+                .lineTo(new Vector2d(-11, 15))
                 .build();
 
         TrajectorySequence green = drive.trajectorySequenceBuilder(setUpPark.end())
@@ -112,13 +112,13 @@ public class Right12Auto extends CommandOpMode {
 
         baseWebcam.startSleeveDetection(true);
 
-
         telemetry.addLine("Ready to Start");
         telemetry.update();
 
-        waitForStart();
 
+        waitForStart();
         logger.info("Starting Match");
+
 
         SleeveDetection.SleeveColor sleeveColor = baseWebcam.getSleeveColor();
         telemetry.addData("Found Sleeve ", sleeveColor);
@@ -138,8 +138,7 @@ public class Right12Auto extends CommandOpMode {
                                 new FollowTrajectoryCommand(drive, preloadDelivery),
                                 new SequentialCommandGroup(
                                         new WaitCommand(600),
-                                        new HighGoal(rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, claw)
-                                )
+                                        new MediumGoal(rotation, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, rotationBottomLimitSwitch, rotationTopLimitSwitch, claw))
                         ),
                         new WaitCommand(250),
                         new OpenClawDeliver(claw),
@@ -154,7 +153,7 @@ public class Right12Auto extends CommandOpMode {
                                         new FollowTrajectoryCommand(drive, approachPole)
                                 )
                         ),
-                        new HighGoal(rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, claw),
+                        new MediumGoal(rotation, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, rotationBottomLimitSwitch, rotationTopLimitSwitch, claw),
                         new WaitCommand(200),
                         new OpenClawDeliver(claw),
                         new WaitCommand(150),
@@ -168,11 +167,25 @@ public class Right12Auto extends CommandOpMode {
                                         new FollowTrajectoryCommand(drive, approachPole)
                                 )
                         ),
-                        new HighGoal(rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, claw),
+                        new MediumGoal(rotation, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, rotationBottomLimitSwitch, rotationTopLimitSwitch, claw),
                         new WaitCommand(200),
                         new OpenClawDeliver(claw),
                         new WaitCommand(150),
                         // -- CYCLE 2 --
+
+                        new PickUpStack(drive, extension, rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, extensionLeftLimitSwitch, extensionRightLimitSwitch, claw, pickUpStackPosition, ConeStackLevel.THREE),
+                        new ParallelCommandGroup(
+                                new Extend(extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, ConeStackLevel.BACK_AWAY),
+                                new SequentialCommandGroup(
+                                        new WaitCommand(350),
+                                        new FollowTrajectoryCommand(drive, approachPole)
+                                )
+                        ),
+                        new MediumGoal(rotation, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, rotationBottomLimitSwitch, rotationTopLimitSwitch, claw),
+                        new WaitCommand(200),
+                        new OpenClawDeliver(claw),
+                        new WaitCommand(150),
+                        // -- CYCLE 3 --
 
                         new Substation(rotation, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, rotationBottomLimitSwitch, rotationTopLimitSwitch, claw),
                         new FollowTrajectoryCommand(drive, setUpPark),
