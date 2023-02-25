@@ -40,7 +40,6 @@ public class Left13Auto extends CommandOpMode {
 
     @Override
     public void initialize() {
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         telemetry.addLine("Creating Subsystems");
         telemetry.update();
 
