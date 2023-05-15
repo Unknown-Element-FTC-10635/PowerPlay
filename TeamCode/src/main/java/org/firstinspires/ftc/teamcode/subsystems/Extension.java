@@ -111,7 +111,7 @@ public class Extension extends SubsystemBase {
     }
 
     public boolean atTargetLevel() {
-        double average = (leftExtension.getCurrentPosition() + rightExtension.getCurrentPosition()) / 2.0;
+        double average = leftExtension.getCurrentPosition(); //(leftExtension.getCurrentPosition() + rightExtension.getCurrentPosition()) / 2.0;
         return average < targetLevel.getHeight() + 5 && average > targetLevel.getHeight() - 5;
     }
 

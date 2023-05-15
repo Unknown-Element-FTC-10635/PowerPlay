@@ -41,7 +41,7 @@ public class UKTeleOp extends OpMode {
     private final Gamepad previousGamepad2 = new Gamepad();
 
     private boolean speedToggle = false;
-    private double wheelMultiplier = 0.8;
+    private double wheelMultiplier = 0.4;
 
     private boolean rumbleToggle = true;
 
@@ -63,7 +63,7 @@ public class UKTeleOp extends OpMode {
         extensionRightLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "extensionRSW");
         rotationBottomLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "rotationBSW");
         rotationTopLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "rotationTSW");
-        colorSensors = new ColorSensor(hardwareMap, telemetry);
+        //colorSensors = new ColorSensor(hardwareMap, telemetry);
         extension = new Extension(hardwareMap, telemetry);
         rotation = new Rotation(hardwareMap, telemetry);
         claw = new Claw(hardwareMap, telemetry);
@@ -78,7 +78,7 @@ public class UKTeleOp extends OpMode {
 
     @Override
     public void start() {
-        CommandScheduler.getInstance().registerSubsystem(rotation, rotationBottomLimitSwitch, extensionLeftLimitSwitch, extensionRightLimitSwitch, extension, claw, rotationTopLimitSwitch, colorSensors);
+        CommandScheduler.getInstance().registerSubsystem(rotation, rotationBottomLimitSwitch, extensionLeftLimitSwitch, extensionRightLimitSwitch, extension, claw, rotationTopLimitSwitch);
 
         extension.resetLeft();
         extension.resetRight();
@@ -101,12 +101,16 @@ public class UKTeleOp extends OpMode {
         }
 
         // Primary
-        backRight.setPower(((gamepad1.left_stick_y - gamepad1.left_stick_x) + gamepad1.right_stick_x) * wheelMultiplier);
-        frontLeft.setPower(((gamepad1.left_stick_y - gamepad1.left_stick_x) - gamepad1.right_stick_x) * wheelMultiplier);
-        backLeft.setPower(((gamepad1.left_stick_y + gamepad1.left_stick_x) - gamepad1.right_stick_x) * wheelMultiplier);
-        frontRight.setPower(((gamepad1.left_stick_y + gamepad1.left_stick_x) + gamepad1.right_stick_x) * wheelMultiplier);
+        double forward = currentGamepad1.left_stick_y;
+        double turn = currentGamepad1.left_stick_x;
+        double strafe = currentGamepad1.right_stick_x;
 
+        backRight.setPower(((forward - turn) + strafe) * wheelMultiplier);
+        frontLeft.setPower(((forward - turn) - strafe) * wheelMultiplier);
+        backLeft.setPower(((forward + turn) - strafe) * wheelMultiplier);
+        frontRight.setPower(((forward + turn) + strafe) * wheelMultiplier);
 
+        /*
         if (currentGamepad1.triangle && !previousGamepad1.triangle) {
             commandScheduler.schedule(new HighGoal(rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, claw));
         }
@@ -129,7 +133,7 @@ public class UKTeleOp extends OpMode {
 
         if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
             commandScheduler.schedule(new Substation(rotation, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, rotationBottomLimitSwitch, rotationTopLimitSwitch, claw));
-        }
+        }*/
 
         commandScheduler.run();
 
@@ -153,9 +157,9 @@ public class UKTeleOp extends OpMode {
         if (currentGamepad1.right_stick_button && !previousGamepad1.right_stick_button) {
             speedToggle = !speedToggle;
             if (speedToggle) {
-                wheelMultiplier = 1;
-            } else {
                 wheelMultiplier = 0.8;
+            } else {
+                wheelMultiplier = 0.4;
             }
         }
 
@@ -209,11 +213,12 @@ public class UKTeleOp extends OpMode {
             extension.resetRight();
         }
 
+        /*
         if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up) {
             rumbleToggle = !rumbleToggle;
         }
 
-        if (rumbleToggle && !gamepad1.isRumbling()) {
+        if (rumbleToggle && !currentGamepad1.isRumbling()) {
             if (colorSensors.leftNotGreen() && colorSensors.rightNotGreen()) {
                 gamepad1.rumble(1, 1, 100);
             } else if (colorSensors.leftNotGreen()) {
@@ -225,6 +230,11 @@ public class UKTeleOp extends OpMode {
 
         if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
             rotation.setEnableSlowdown(!rotation.isEnableSlowdown());
+        }
+        */
+
+        if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
+            throw new UnsupportedOperationException();
         }
 
         telemetry.addData("Loop Time", loopTime.milliseconds());

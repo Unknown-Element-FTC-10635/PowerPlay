@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Rotation;
 import java.util.logging.Logger;
 
 public class RotateTop extends CommandBase {
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
+    //private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     private final Rotation primaryRotation;
     private final LimitSwitch topSwitch;
@@ -26,13 +26,13 @@ public class RotateTop extends CommandBase {
     @Override
     public void initialize() {
         primaryRotation.rotateTo(true, speed);
-        logger.info("Initializing Rotation " + speed);
+        //logger.info("Initializing Rotation " + speed);
     }
 
     @Override
     public boolean isFinished() {
         if (topSwitch.isPressed()) {
-            logger.info("Finished Rotation from Top Limit Switch");
+            //logger.info("Finished Rotation from Top Limit Switch");
             return true;
         } else {
             return false;
@@ -42,6 +42,6 @@ public class RotateTop extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         primaryRotation.stop();
-        logger.info("Ending at current angle: " + primaryRotation.getAngle());
+        //logger.info("Ending at current angle: " + primaryRotation.getAngle());
     }
 }

@@ -39,13 +39,15 @@ public class Left1Auto extends CommandOpMode {
         telemetry.update();
 
         // Subsystems
-        Extension extension = new Extension(hardwareMap, telemetry);
-        Rotation rotation = new Rotation(hardwareMap, telemetry);
         LimitSwitch extensionLeftLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "extensionLSW");
         LimitSwitch extensionRightLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "extensionRSW");
         LimitSwitch rotationBottomLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "rotationBSW");
         LimitSwitch rotationTopLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "rotationTSW");
+        Extension extension = new Extension(hardwareMap, telemetry);
+        Rotation rotation = new Rotation(hardwareMap, telemetry);
         Claw claw = new Claw(hardwareMap, telemetry);
+
+        extensionLeftLimitSwitch.setInverted(true);
 
         BaseWebcam baseWebcam = new BaseWebcam(hardwareMap);
 
