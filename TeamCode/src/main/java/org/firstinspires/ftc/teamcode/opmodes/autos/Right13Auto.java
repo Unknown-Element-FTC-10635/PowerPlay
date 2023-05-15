@@ -34,8 +34,8 @@ import org.firstinspires.ftc.teamcode.visionpipeline.SleeveDetection;
 
 import java.util.logging.Logger;
 
-@Autonomous(name = "RIGHT (1+2) - High", group = "Right")
-public class Right12Auto extends CommandOpMode {
+@Autonomous(name = "RIGHT (1+3) - High", group = "Right")
+public class Right13Auto extends CommandOpMode {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     @Override
@@ -172,6 +172,20 @@ public class Right12Auto extends CommandOpMode {
                         new OpenClawDeliver(claw),
                         new WaitCommand(150),
                         // -- CYCLE 2 --
+
+                        new PickUpStack(drive, extension, rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, extensionLeftLimitSwitch, extensionRightLimitSwitch, claw, pickUpStackPosition, ConeStackLevel.THREE),
+                        new ParallelCommandGroup(
+                                new Extend(extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, ConeStackLevel.BACK_AWAY),
+                                new SequentialCommandGroup(
+                                        new WaitCommand(350),
+                                        new FollowTrajectoryCommand(drive, approachPole)
+                                )
+                        ),
+                        new HighGoal(rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, claw),
+                        new WaitCommand(200),
+                        new OpenClawDeliver(claw),
+                        new WaitCommand(150),
+                        // -- CYCLE 3 --
 
                         new Substation(rotation, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, rotationBottomLimitSwitch, rotationTopLimitSwitch, claw),
                         new FollowTrajectoryCommand(drive, setUpPark),

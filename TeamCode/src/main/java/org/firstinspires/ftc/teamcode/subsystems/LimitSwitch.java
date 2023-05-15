@@ -12,19 +12,32 @@ public class LimitSwitch extends SubsystemBase {
     private final Telemetry telemetry;
 
     private final String name;
+    private boolean inverted = false;
 
     public LimitSwitch(HardwareMap hardwareMap, Telemetry telemetry, String name) {
-        this.limitSwitch = hardwareMap.get(DigitalChannel.class , name);
+        this.limitSwitch = hardwareMap.get(DigitalChannel.class, name);
         this.telemetry = telemetry;
         this.name = name;
     }
 
     public boolean isPressed() {
-        return limitSwitch.getState();
+        if (!inverted) {
+            return limitSwitch.getState();
+        } else {
+            return !limitSwitch.getState();
+        }
+    }
+
+    public void setInverted(boolean invert) {
+        inverted = invert;
     }
 
     @Override
     public void periodic() {
-        telemetry.addData(name + " Status:", limitSwitch.getState());
+        if (!inverted) {
+            telemetry.addData(name + " Status:", limitSwitch.getState());
+        } else {
+            telemetry.addData(name + " Status:", !limitSwitch.getState());
+        }
     }
 }

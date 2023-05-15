@@ -5,48 +5,68 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-
-import org.firstinspires.ftc.teamcode.subsystems.Extension;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 @Config
 @TeleOp
-public class TestingTeleop extends LinearOpMode {
+public class TestingTeleop extends OpMode {
     private PIDController pidController1, pidController2;
     private DcMotorEx leftExtension, rightExtension;
 
-    public static double pL = 0.00175, iL = 0, dL = 0.00001;
-    public static double fL = 0.001;
+    public static double pL = 0.0025, iL = 0, dL = 0.000008;
+    public static double fL = 0.012;
 
-    public static double pR = 0.006, iR = 0, dR = 0.0001;
-    public static double fR = 0.0125;
+    public static double pR = 0.002, iR = 0, dR = 0.000005;
+    public static double fR = 0.0023;
 
     public static int target = 0;
 
     private static final double TICKS_PER_DEGREE = 537.7 / 360;
 
     @Override
-    public void runOpMode() throws InterruptedException {
-        //DcMotorEx leftExtesion = hardwareMap.get(DcMotorEx.class, "leftExtension");
-        //DcMotorEx rightExtension = hardwareMap.get(DcMotorEx.class, "rightExtension");
+    public void init() {
+        pidController1 = new PIDController(pL, iL, dL);
+        pidController2 = new PIDController(pR, iR, dR);
 
-        Extension extension = new Extension(hardwareMap, telemetry);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        waitForStart();
+        leftExtension = hardwareMap.get(DcMotorEx.class, "leftExtension");
+        rightExtension = hardwareMap.get(DcMotorEx.class, "rightExtension");
+        rightExtension.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        while (opModeIsActive()) {
-            if (gamepad1.right_bumper) {
-                extension.moveManual(1);
-            } else if (gamepad1.left_bumper) {
-                extension.moveManual(-0.5);
-            } else {
-                extension.moveManual(0);
-            }
-        }
+        leftExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        rightExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    @java.lang.Override
+    public void loop() {
+        pidController1.setPID(pL, iL, dL);
+        int armPos1 = leftExtension.getCurrentPosition();
+        double pid1 = pidController1.calculate(armPos1, target);
+        double ff1 = Math.cos(Math.toRadians(target / TICKS_PER_DEGREE)) * fL;
+
+        double power1 = pid1 + ff1;
+        leftExtension.setPower(power1);
+
+        pidController2.setPID(pR, iR, dR);
+        int armPos2 = rightExtension.getCurrentPosition();
+        double pid2 = pidController2.calculate(armPos2, target);
+        double ff2 = Math.cos(Math.toRadians(target / TICKS_PER_DEGREE)) * fR;
+
+        double power2 = pid2 + ff2;
+        rightExtension.setPower(power2);
+
+        telemetry.addData("Position Left", armPos1);
+        telemetry.addData("Position Right", armPos2);
+        telemetry.addData("Target", target);
+        telemetry.update();
     }
 }

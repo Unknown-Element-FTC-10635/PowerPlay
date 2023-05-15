@@ -39,12 +39,15 @@ public class Left1Auto extends CommandOpMode {
         telemetry.update();
 
         // Subsystems
+        LimitSwitch extensionLeftLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "extensionLSW");
+        LimitSwitch extensionRightLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "extensionRSW");
+        LimitSwitch rotationBottomLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "rotationBSW");
+        LimitSwitch rotationTopLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "rotationTSW");
         Extension extension = new Extension(hardwareMap, telemetry);
         Rotation rotation = new Rotation(hardwareMap, telemetry);
-        LimitSwitch extensionLimitSwitch = new LimitSwitch(hardwareMap, telemetry, "extensionSW");
-        LimitSwitch rotationBottomSwitch = new LimitSwitch(hardwareMap, telemetry, "rotationBSW");
-        LimitSwitch rotationTopSwitch = new LimitSwitch(hardwareMap, telemetry, "rotationTSW");
         Claw claw = new Claw(hardwareMap, telemetry);
+
+        extensionLeftLimitSwitch.setInverted(true);
 
         BaseWebcam baseWebcam = new BaseWebcam(hardwareMap);
 
@@ -101,7 +104,7 @@ public class Left1Auto extends CommandOpMode {
         telemetry.addLine("Scheduling Tasks");
         telemetry.update();
 
-        register(extensionLimitSwitch, extension, claw, rotation, rotationBottomSwitch, rotationTopSwitch);
+        register(extensionLeftLimitSwitch, extension, claw, rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch);
 
         schedule(
                 new SequentialCommandGroup(
@@ -113,12 +116,12 @@ public class Left1Auto extends CommandOpMode {
                                 new FollowTrajectoryCommand(drive, preloadDelivery),
                                 new SequentialCommandGroup(
                                         new WaitCommand(350),
-                                        new HighGoal(rotation, rotationBottomSwitch, rotationTopSwitch, extension, extensionLimitSwitch, claw)
+                                        new HighGoal(rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, claw)
                                 )
                         ),
                         new OpenClawDeliver(claw),
                         new WaitCommand(1000),
-                        new Substation(rotation, extension, extensionLimitSwitch, rotationBottomSwitch, rotationTopSwitch, claw),
+                        new Substation(rotation, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, rotationBottomLimitSwitch, rotationTopLimitSwitch, claw),
                         new FollowTrajectoryCommand(drive, setUpPark),
                         new OpenClawPickUp(claw),
                         new PickPark(drive, sleeveColor, purple, orange, green),
