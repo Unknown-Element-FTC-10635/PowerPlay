@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.util.lift;
 public enum PoleLevel implements LiftHeight {
     SUBSTATION(0),
     LOW(100),
-    MEDIUM(625),
+    MEDIUM(650),
     HIGH(1450),
     EXTRA_TALL(1600);
 

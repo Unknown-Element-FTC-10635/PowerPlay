@@ -42,21 +42,27 @@ public class Claw extends SubsystemBase {
 
     // https://www.desmos.com/calculator/p1p6mngfet
     public void openBig() {
-        servo.setPosition(0.55);
+        servo.setPosition(0.37);
 
         currentState = State.OPEN;
         currentOpenness = Open.BIG;
     }
 
     public void openSmall() {
-        servo.setPosition(0.62);
+        servo.setPosition(0.48);
 
         currentState = State.OPEN;
         currentOpenness = Open.SMALL;
     }
 
     public void close() {
-        servo.setPosition(0.73);
+        servo.setPosition(0.54);
+
+        currentState = State.CLOSED;
+    }
+
+     public void closeMore() {
+        servo.setPosition(0.58);
 
         currentState = State.CLOSED;
     }

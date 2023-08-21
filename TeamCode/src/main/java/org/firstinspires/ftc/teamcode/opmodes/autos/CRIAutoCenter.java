@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmodes.autos;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
@@ -10,9 +8,9 @@ import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.commandgroups.HighGoal;
+import org.firstinspires.ftc.teamcode.commandgroups.MediumGoal;
 import org.firstinspires.ftc.teamcode.commandgroups.PickPark;
 import org.firstinspires.ftc.teamcode.commandgroups.PickUpStack;
 import org.firstinspires.ftc.teamcode.commandgroups.Substation;
@@ -31,13 +29,13 @@ import org.firstinspires.ftc.teamcode.subsystems.Rotation;
 import org.firstinspires.ftc.teamcode.util.BaseWebcam;
 import org.firstinspires.ftc.teamcode.util.CurrentOpmode;
 import org.firstinspires.ftc.teamcode.util.lift.ConeStackLevel;
+import org.firstinspires.ftc.teamcode.util.lift.LiftHeight;
 import org.firstinspires.ftc.teamcode.visionpipeline.SleeveDetection;
 
 import java.util.logging.Logger;
 
-@Disabled
-@Autonomous(name = "RIGHT (1+2) - High", group = "Right")
-public class Right12Auto extends CommandOpMode {
+@Autonomous(name = "Center Auto (Bottom) - CRI")
+public class CRIAutoCenter extends CommandOpMode {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     @Override
@@ -65,61 +63,51 @@ public class Right12Auto extends CommandOpMode {
         telemetry.addLine("Creating Paths");
         telemetry.update();
 
-        Pose2d start = new Pose2d(-33.0, 64, Math.toRadians(270));
+        Pose2d start = new Pose2d(-8, -64, Math.toRadians(90));
         drive.setPoseEstimate(start);
 
         TrajectorySequence preloadDelivery = drive.trajectorySequenceBuilder(start)
+                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(60, 60, DriveConstants.TRACK_WIDTH))
+                .splineTo(new Vector2d(13, -42), Math.toRadians(90))
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, DriveConstants.TRACK_WIDTH))
-                .splineTo(new Vector2d(-36, 40), Math.toRadians(270))
-                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(100, 100, DriveConstants.TRACK_WIDTH))
-                .lineTo(new Vector2d(-33.5, 5))
+                .lineToSplineHeading(new Pose2d(13, -9, Math.toRadians(315)))
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, DriveConstants.TRACK_WIDTH))
-                .back(8)
-                .lineToSplineHeading(new Pose2d(-36, 12, Math.toRadians(135)))
-                .back(10)
+                .back(6)
                 .build();
 
-        TrajectorySequence pickUpStackPosition = drive.trajectorySequenceBuilder(preloadDelivery.end())
-                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(50, 50, DriveConstants.TRACK_WIDTH))
-                .splineTo(new Vector2d(-40, 12), Math.toRadians(180))
-                .lineTo(new Vector2d(-60, 12))
+        TrajectorySequence setUpPark = drive.trajectorySequenceBuilder(preloadDelivery.end())
+                .splineTo(new Vector2d(13, -25), Math.toRadians(270))
                 .build();
 
-        TrajectorySequence approachPole = drive.trajectorySequenceBuilder(pickUpStackPosition.end())
+        TrajectorySequence signalZone1 = drive.trajectorySequenceBuilder(setUpPark.end())
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, DriveConstants.TRACK_WIDTH))
-                .setReversed(true)
-                .lineTo(new Vector2d(-40, 12))
-                .splineTo(new Vector2d(-29, 6), Math.toRadians(300))
+                .lineTo(new Vector2d(13, -35))
                 .build();
 
-        TrajectorySequence setUpPark = drive.trajectorySequenceBuilder(approachPole.end())
-                .splineTo(new Vector2d(-40, 12), Math.toRadians(180))
+        TrajectorySequence signalZone2 = drive.trajectorySequenceBuilder(setUpPark.end())
+                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, DriveConstants.TRACK_WIDTH))
+                .splineTo(new Vector2d(0, -35), Math.toRadians(180))
+                .lineTo(new Vector2d(-35, -35))
                 .build();
 
-        TrajectorySequence orange = drive.trajectorySequenceBuilder(setUpPark.end())
-                .back(5)
-                .build();
-
-        TrajectorySequence purple = drive.trajectorySequenceBuilder(setUpPark.end())
-                .lineTo(new Vector2d(-11, 14))
-                .build();
-
-        TrajectorySequence green = drive.trajectorySequenceBuilder(setUpPark.end())
-                .lineTo(new Vector2d(-60, 15))
+        TrajectorySequence signalZone3 = drive.trajectorySequenceBuilder(setUpPark.end())
+                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, 40, DriveConstants.TRACK_WIDTH))
+                .splineTo(new Vector2d(0, -34.5), Math.toRadians(180))
+                .lineTo(new Vector2d(-13, -34.5))
                 .build();
 
         telemetry.addLine("Starting Webcam");
         telemetry.update();
 
-        baseWebcam.startSleeveDetection(true);
-
+        baseWebcam.startSleeveDetection(false);
 
         telemetry.addLine("Ready to Start");
         telemetry.update();
 
-        waitForStart();
 
+        waitForStart();
         logger.info("Starting Match");
+
 
         SleeveDetection.SleeveColor sleeveColor = baseWebcam.getSleeveColor();
         telemetry.addData("Found Sleeve ", sleeveColor);
@@ -135,50 +123,18 @@ public class Right12Auto extends CommandOpMode {
                         new OpenClawDeliver(claw),
                         new CloseClaw(claw),
                         new WaitCommand(300),
-                        new ParallelCommandGroup(
-                                new FollowTrajectoryCommand(drive, preloadDelivery),
-                                new SequentialCommandGroup(
-                                        new WaitCommand(600),
-                                        new HighGoal(rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, claw)
-                                )
-                        ),
-                        new WaitCommand(200),
+                        new Extend(extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, ConeStackLevel.THREE),
+                        new FollowTrajectoryCommand(drive, preloadDelivery),
+                        new HighGoal(rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, claw),
+                        new WaitCommand(750),
                         new OpenClawDeliver(claw),
                         new WaitCommand(100),
                         // -- PRELOAD --
 
-                        new PickUpStack(drive, extension, rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, extensionLeftLimitSwitch, extensionRightLimitSwitch, claw, pickUpStackPosition, ConeStackLevel.FIVE),
-                        new ParallelCommandGroup(
-                                new Extend(extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, ConeStackLevel.BACK_AWAY),
-                                new SequentialCommandGroup(
-                                        new WaitCommand(400),
-                                        new FollowTrajectoryCommand(drive, approachPole)
-                                )
-                        ),
-                        new HighGoal(rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, claw),
-                        new WaitCommand(200),
-                        new OpenClawDeliver(claw),
-                        new WaitCommand(150),
-                        // -- CYCLE 1 --
-
-                        new PickUpStack(drive, extension, rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, extensionLeftLimitSwitch, extensionRightLimitSwitch, claw, pickUpStackPosition, ConeStackLevel.FOUR),
-                        new ParallelCommandGroup(
-                                new Extend(extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, ConeStackLevel.BACK_AWAY),
-                                new SequentialCommandGroup(
-                                        new WaitCommand(400),
-                                        new FollowTrajectoryCommand(drive, approachPole)
-                                )
-                        ),
-                        new HighGoal(rotation, rotationBottomLimitSwitch, rotationTopLimitSwitch, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, claw),
-                        new WaitCommand(200),
-                        new OpenClawDeliver(claw),
-                        new WaitCommand(150),
-                        // -- CYCLE 2 --
-
                         new Substation(rotation, extension, extensionLeftLimitSwitch, extensionRightLimitSwitch, rotationBottomLimitSwitch, rotationTopLimitSwitch, claw),
                         new FollowTrajectoryCommand(drive, setUpPark),
                         new OpenClawPickUp(claw),
-                        new PickPark(drive, sleeveColor, purple, orange, green),
+                        new PickPark(drive, sleeveColor, signalZone1, signalZone2, signalZone3),
 
                         new InstantCommand(() -> logger.info("Finished Program"))
                 )

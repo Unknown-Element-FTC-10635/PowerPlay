@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.commandgroups.PickPark;
 import org.firstinspires.ftc.teamcode.commands.CloseClaw;
@@ -22,6 +23,7 @@ import org.firstinspires.ftc.teamcode.visionpipeline.SleeveDetection;
 
 import java.util.logging.Logger;
 
+@Disabled
 @Autonomous(name = "RIGHT - Park", group = "Right")
 public class RightPark extends CommandOpMode {
     private final Logger logger = Logger.getLogger(this.getClass().getName());

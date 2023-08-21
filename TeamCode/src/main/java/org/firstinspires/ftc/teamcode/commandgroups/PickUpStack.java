@@ -30,10 +30,9 @@ public class PickUpStack extends SequentialCommandGroup {
                         ),
                         new FollowTrajectoryCommand(drive, pickUpStackPosition)
                 ),
-                new ParallelCommandGroup(
-                        new CloseClaw(claw),
-                        new WaitCommand(150)
-                )
+                new WaitCommand(300),
+                new CloseClaw(claw),
+                new WaitCommand(350)
         );
     }
 }

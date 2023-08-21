@@ -41,7 +41,7 @@ public class UKTeleOp extends OpMode {
     private final Gamepad previousGamepad2 = new Gamepad();
 
     private boolean speedToggle = false;
-    private double wheelMultiplier = 0.4;
+    private double wheelMultiplier = 0.75;
 
     private boolean rumbleToggle = true;
 
@@ -151,15 +151,18 @@ public class UKTeleOp extends OpMode {
                     }
                 }
             }
+            if (currentGamepad1.triangle && !previousGamepad1.triangle) {
+                claw.closeMore();
+            }
         }
 
         // Primary
         if (currentGamepad1.right_stick_button && !previousGamepad1.right_stick_button) {
             speedToggle = !speedToggle;
             if (speedToggle) {
-                wheelMultiplier = 0.8;
+                wheelMultiplier = 0.9;
             } else {
-                wheelMultiplier = 0.4;
+                wheelMultiplier = 0.75;
             }
         }
 

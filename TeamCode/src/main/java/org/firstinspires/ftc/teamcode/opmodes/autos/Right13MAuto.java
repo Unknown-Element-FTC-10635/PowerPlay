@@ -10,6 +10,7 @@ import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.commandgroups.MediumGoal;
 import org.firstinspires.ftc.teamcode.commandgroups.PickPark;
@@ -34,6 +35,7 @@ import org.firstinspires.ftc.teamcode.visionpipeline.SleeveDetection;
 
 import java.util.logging.Logger;
 
+@Disabled
 @Autonomous(name = "RIGHT (1+3) - Medium", group = "Right")
 public class Right13MAuto extends CommandOpMode {
     private final Logger logger = Logger.getLogger(this.getClass().getName());

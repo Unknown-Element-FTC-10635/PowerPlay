@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.LimitSwitch;
 import org.firstinspires.ftc.teamcode.subsystems.Rotation;
 import org.firstinspires.ftc.teamcode.util.CurrentOpmode;
 
+@Disabled
 @Autonomous
 public class TestAuto extends CommandOpMode {
     @Override

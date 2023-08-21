@@ -16,7 +16,7 @@ public class RotateHome extends SequentialCommandGroup {
     public RotateHome(Rotation rotation, LimitSwitch bottomSwitch, LimitSwitch topSwitch) {
         //logger.info("Scheduling Rotate Home");
         addCommands(
-                new Rotate(rotation, bottomSwitch, topSwitch, 80, -1),
+                new Rotate(rotation, bottomSwitch, topSwitch, 100, -1),
                 new Rotate(rotation, bottomSwitch, topSwitch, 40, -0.3),
                 new RotateZero(rotation, bottomSwitch,0.4)
         );
