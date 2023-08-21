@@ -91,14 +91,10 @@ public class UKTeleOp extends OpMode {
 
         CommandScheduler commandScheduler = CommandScheduler.getInstance();
 
-        try {
-            previousGamepad1.copy(currentGamepad1);
-            previousGamepad2.copy(currentGamepad2);
-            currentGamepad1.copy(gamepad1);
-            currentGamepad2.copy(gamepad2);
-        } catch (RobotCoreException e) {
-            telemetry.addLine("Failed to copy");
-        }
+        previousGamepad1.copy(currentGamepad1);
+        previousGamepad2.copy(currentGamepad2);
+        currentGamepad1.copy(gamepad1);
+        currentGamepad2.copy(gamepad2);
 
         // Primary
         double forward = currentGamepad1.left_stick_y;
